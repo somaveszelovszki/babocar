@@ -1,0 +1,15 @@
+[submodule "modules/babocar-core"]
+	path = modules/babocar-core
+	url = git@github.com:somaveszelovszki/babocar-core.git
+[submodule "modules/babocar-hw"]
+	path = modules/babocar-hw
+	url = git@github.com:somaveszelovszki/babocar-hw.git
+[submodule "modules/babocar-micro"]
+	path = modules/babocar-micro
+	url = git@github.com:somaveszelovszki/babocar-micro.git
+[submodule "modules/babocar-logic"]
+	path = modules/babocar-logic
+	url = git@github.com:somaveszelovszki/babocar-logic.git
+[submodule "modules/babocar-test"]
+	path = modules/babocar-test
+	url = git@github.com:somaveszelovszki/babocar-test.git
