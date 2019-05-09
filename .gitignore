@@ -1,0 +1,8 @@
+# Generated docs files
+*.aux
+*.log
+*.bbl
+*.blg
+*.out
+*.thm
+*.toc
