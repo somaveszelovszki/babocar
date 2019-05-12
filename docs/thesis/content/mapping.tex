@@ -23,7 +23,7 @@ As a first subtask of the mapping project, I checked if any implementation is av
 \label{gmapping_drawback_before_move}
 \end{figure}
 
-Figure \ref{gmapping_drawback_before_move} shows a situation where the ball is standing still. A the mapping algorithm of gmapping successfully creates a map (in the form of an occupancy grid) that marks the place of the ball as occupied. However, when the ball starts moving (see figure \ref{gmapping_drawback_after_move}), the map does not change, because the algorithm cannot handle moving obstacles.
+Figure \ref{gmapping_drawback_before_move} shows a situation where the ball is standing still. A the mapping algorithm of gmapping successfully creates a map (in the form of an occupancy grid\footnote{An occupancy grid represents a map in an evenly spaced field of probability values representing if the grid points are occupied by an obstacle}) that marks the place of the ball as occupied. However, when the ball starts moving (see figure \ref{gmapping_drawback_after_move}), the map does not change, because the algorithm cannot handle moving obstacles.
 
 \begin{figure}[!ht]
 \centering
@@ -43,7 +43,62 @@ Figure \ref{gmapping_drawback_before_move} shows a situation where the ball is s
 
 As a conclusion, in this project, gmapping could not be used as the producer of the static map. But that didn't mean it couln't be used for its second feature, localization. Note, that the mapping implementation I made is not a SLAM algorithm, it is not able to make corrections to the car's pose. So for that purpose, I still needed the help of gmapping, which proved to be very reliable at localization.
 
-In order to create two disjunct maps, one static and one dynamic, the key element of the process is the separation of the moving and non-moving obstacles of the measured points.
+In order to create two disjunct maps, one static and one dynamic, the key element of the process is the separation of the moving and non-moving obstacles of the measured points. After determining these two disjunct set of points, the maps can be converted to any desired or required format. Static maps are usually published as occupancy grids, while dynamic obstacles need to present information about their speed vector. Occupancy grids do not group the grid points according to their probabilities, therefore they do not know about the obstacles' borders and areas\footnote{In this project, 2D LIDARs were used, therefore the measured objects were seen as 2D shapes that have areas, not 3D objects that have volumes}. Dynamic obstacles however can be either represented as separate points with their own speed vectors, or groups of points, each groups having one speed vector. I chose the latter representation, thus publishing groups that contain a set of points (all the points, ideally) of the same obstacle. This way there is a one-to-one relationship between moving obstacles and groups. The separation and grouping methods of the mapping process is shown on the following diagram.
+
+\tikzset{
+     base_node/.style = {rectangle, rounded corners, draw=black,
+                         minimum width=5cm, minimum height=1cm,
+                         text centered, font=\sffamily},
+  inout_node/.style   = {base_node, fill=blue!30},
+  common_node/.style  = {base_node, fill=orange!15},
+  dynamic_node/.style = {base_node, fill=green!30},
+  static_node/.style  = {base_node, fill=red!30},
+  decoration={brace},
+  tuborg/.style={decorate},
+  tubnode_left/.style={midway, left=2pt},
+  tubnode_right/.style={midway, right=2pt}
+}
+
+\begin{tikzpicture}[
+    node distance=1.5cm,
+    every node/.style={fill=white, font=\sffamily}, align=center]
+  % Node descriptions
+  \node (scan)            [inout_node]                                   {Input scan};
+  \node (convert_abs)     [common_node, below of=scan]                   {Convert to absolute points};
+  \node (sub_image)       [common_node, below of=convert_abs]            {Create subtraction image};
+  \node (dynamic_points)  [common_node, below of=sub_image]              {Find dynamic points};
+  \node (groups)          [common_node, below of=dynamic_points]         {Make groups};
+  \node (separate)        [common_node, below of=groups]                 {Separate static points and dynamic groups};
+  % Dynamic nodes
+  \node (speed_vectors)   [dynamic_node, below of=separate, xshift=-3cm] {Calculate speed vectors};
+  \node (areas)           [dynamic_node, below of=speed_vectors]         {Calculate and validate areas};
+  \node (publish_dynamic) [inout_node, below of=areas]                   {Publish dynamic groups};
+  % Static nodes
+  \node (update_map)      [static_node, below of=separate, xshift=3cm]   {Update static map};
+  \node (convert_scan)    [static_node, below of=update_map]             {Remap to LIDAR scan};
+  \node (publish_static)  [inout_node, below of=convert_scan]            {Publish static scan};
+  % Connections
+  \draw[->]           (scan) -- (convert_abs);
+  \draw[->]    (convert_abs) -- (sub_image);
+  \draw[->]      (sub_image) -- (dynamic_points);
+  \draw[->] (dynamic_points) -- (groups);
+  \draw[->]         (groups) -- (separate);
+  % Dynamic connections
+  \draw[->]       (separate) -- (speed_vectors);
+  \draw[->]  (speed_vectors) -- (areas);
+  \draw[->]          (areas) -- (publish_dynamic);
+  % Static connections
+  \draw[->]       (separate) -- (update_map);
+  \draw[->]     (update_map) -- (convert_scan);
+  \draw[->]   (convert_scan) -- (publish_static);
+  % Decorations
+  \draw[tuborg, decoration={brace}] let \p1=(convert_abs.north), \p2=(separate.south) in
+    ($(\x1+4cm, \y1)$) -- ($(\x1+4cm, \y2)$) node[tubnode_right] {Separation};
+  \draw[tuborg, decoration={brace}] let \p1=(speed_vectors.north), \p2=(areas.south) in
+    ($(\x1-3cm, \y2)$) -- ($(\x1-3cm, \y1)$) node[tubnode_left] {Dynamic};
+  \draw[tuborg, decoration={brace}] let \p1=(update_map.north), \p2=(convert_scan.south) in
+    ($(\x1+3cm, \y1)$) -- ($(\x1+3cm, \y2)$) node[tubnode_right] {Static};
+\end{tikzpicture}
 
 %----------------------------------------------------------------------------
 \section{Subtraction image}
