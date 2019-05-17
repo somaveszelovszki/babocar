@@ -32,30 +32,28 @@ In order to create two disjunct maps, one static and one dynamic, the key elemen
         \node (groups)          [common_node, below of=dynamic_points]         {Make dynamic groups};
         \node (separate)        [common_node, below of=groups]                 {Separate static points from groups};
         % Dynamic nodes
-        \node (speed_vectors)   [dynamic_node, below of=separate, xshift=-3cm] {Calculate speed vectors};
-        \node (areas)           [dynamic_node, below of=speed_vectors]         {Calculate and validate areas};
-        \node (publish_dynamic) [inout_node, below of=areas]                   {Publish dynamic obstacles};
+        \node (areas)           [dynamic_node, below of=separate, xshift=-3cm] {Measure areas};
+        \node (tracking)        [dynamic_node, below of=areas]                 {Track groups};
+        \node (publish_dynamic) [inout_node, below of=tracking]                {Publish dynamic obstacles};
         % Static nodes
         \node (update_map)      [static_node, below of=separate, xshift=3cm]   {Update static map};
-        \node (convert_scan)    [static_node, below of=update_map]             {Remap to LIDAR scan};
-        \node (publish_static)  [inout_node, below of=convert_scan]            {Publish static scan};
+        \node (publish_static)  [inout_node, below of=update_map]              {Publish static scan};
         % Connections
         \draw[->]           (scan) -- (convert_abs);
         \draw[->]    (convert_abs) -- (dynamic_points);
         \draw[->] (dynamic_points) -- (groups);
         \draw[->]         (groups) -- (separate);
         % Dynamic connections
-        \draw[->]       (separate) -- (speed_vectors);
-        \draw[->]  (speed_vectors) -- (areas);
-        \draw[->]          (areas) -- (publish_dynamic);
+        \draw[->]       (separate) -- (areas);
+        \draw[->]          (areas) -- (tracking);
+        \draw[->]       (tracking) -- (publish_dynamic);
         % Static connections
         \draw[->]       (separate) -- (update_map);
-        \draw[->]     (update_map) -- (convert_scan);
-        \draw[->]   (convert_scan) -- (publish_static);
+        \draw[->]     (update_map) -- (publish_static);
         % Decorations
         \draw[tuborg, decoration={brace}] let \p1=(scan.north), \p2=(separate.south) in
             ($(\x1+3.4cm, \y1)$) -- ($(\x1+3.4cm, \y2)$) node[tubnode_right] {Separation + grouping};
-        \draw[tuborg, decoration={brace}] let \p1=(speed_vectors.north), \p2=(publish_dynamic.south) in
+        \draw[tuborg, decoration={brace}] let \p1=(areas.north), \p2=(publish_dynamic.south) in
             ($(\x1-3cm, \y2)$) -- ($(\x1-3cm, \y1)$) node[tubnode_left] {Dynamic};
         \draw[tuborg, decoration={brace}] let \p1=(update_map.north), \p2=(publish_static.south) in
             ($(\x1+3cm, \y1)$) -- ($(\x1+3cm, \y2)$) node[tubnode_right] {Static};
@@ -67,6 +65,7 @@ In order to create two disjunct maps, one static and one dynamic, the key elemen
 The diagram consists of 3 subgraphs - these are also marked on the diagram. The first, and most important is the separation and grouping of dynamic points. The second section describes the additional calculations that need to be done for the dynamic obstacles, and consists the documentation for the message structure definining these dynamic obstacles. The third section is about the static map that is built from the static points. The next sections are going to explain these subgraphs in detail.
 
 \section{Separation and grouping}
+\label{chap:separation_and_grouping}
 This section describes the method of separating dynamic and static points of the input scan. This step is essential in the pipeline of creating two disjunct maps.
 
 \subsection{Input scan}
@@ -125,7 +124,7 @@ Therefore, two transformations are needed for each input point. The transformati
 
 \subsection{Dynamic points}
 \label{chap:dynamic_points}
-The next step is similar to a creating a subtraction image in image processing, where subtracting two images, taken from the same position but at a different time, results in an image that amplifies the movements between the snapshots. The aim of this algorithm unit is basically the same: selecting the points from the input that are likely to be part of a moving mass. This is done by finding the points among the current measurements that have not been present in the previous ones.
+The next step is similar to a creating a subtraction image in image processing, where subtracting two images, taken from the same position but at a different time, results in an image that amplifies the movements between the snapshots. Previous methods\cite{RealTimeDynamicObjectDetection} that I studied before starting my implementation are also based on this step. The aim of this algorithm unit is basically the same: selecting the points from the input that are likely to be part of a moving mass. This is done by finding the points among the current measurements that have not been present in the previous ones.
 
 This step is best explainable in practice. Let's assume that the position and orientation of the LIDAR is fix, and one object (e.g. a car) in the detected area is moving. Figure \ref{obstacle_movement} shows this situation. On the image, the pale contour represents the previous pose of the object, and the current state is blue.
 
@@ -154,7 +153,7 @@ To understand the method of dynamic point detection, I removed the LIDAR, its vi
     \label{obstacle_movement_lidar_only}
 \end{figure}
 
-The measured points with their compliance radiuses are presented in figure \ref{compliance_radiuses}. The possible dynamic points, that have no points from the previous measurement within their radius, are marked with blue, and their compliance radius with yellow. The possible static points are marked with red, along with their radiuses. Note, that these points are \textit{possible} dynamic and static points. The final classification will be preceded be multiple filtering mechanisms and point grouping, but this is the base for finding dynamic objects.
+The measured points with their compliance radiuses are presented in \autoref{compliance_radiuses}. The possible dynamic points, that have no points from the previous measurement within their radius, are marked with blue, and their compliance radius with yellow. The possible static points are marked with red, along with their radiuses. Note, that these points are \textit{possible} dynamic and static points. The final classification will be preceded be multiple filtering mechanisms and point grouping, but this is the base for finding dynamic objects.
 
 \begin{figure}[!ht]
     \centering
@@ -163,25 +162,112 @@ The measured points with their compliance radiuses are presented in figure \ref{
     \label{compliance_radiuses}
 \end{figure}
 
-Several conclusions can be drew from figure \ref{compliance_radiuses}. The one, and probably most important is that with right parameterizing (number of 'look-up' measurements, compliance radius, etc) this method amplifies the positive\footnote{Previously a distant background was detected, but now a closer object appears.} and negative\footnote{Previously a close object was detected, but now it disappears, and the distant background becomes visible.} changes of the scans. The second remark is that the method does not detect all the points of a moving object. However, due to measurement noise false detections may happen, non-moving points may be marked as dynamic. Therefore, this separation needs to be followed by several filtering and validating steps.
+Several conclusions can be drew from \autoref{compliance_radiuses}. The one, and probably most important is that with right parameterizing (number of 'look-up' measurements, compliance radius, etc) this method amplifies the positive\footnote{Previously a distant background was detected, but now a closer object appears.} and negative\footnote{Previously a close object was detected, but now it disappears, and the distant background becomes visible.} changes of the scans. The second remark is that the method does not detect all the points of a moving object. However, due to measurement noise, false detections may happen, and non-moving points may be marked as dynamic.
 
-\subsection{Dynamic groups}
+Therefore, the result of this separation step needs to be filtered. I implemented a filtering step that only keeps those samples in the set of dynamic points, of which the left and right neighbour in the scan has also been marked dynamic. It can be easily compared to \href{https://en.wikipedia.org/wiki/Erosion_(morphology)}{erosion} in image processing, which is able to remove peaks from the image. Let's take a look at \autoref{dynamic_points}. The possible dynamic points are marked with blue. The filtering mechanism iterates through each of them, and check both neighbours. As it can be easily read from the figure, point \textit{A} has two neighbours that have been marked static, therefore it will be removed from the set of dynamic points. However, points \textit{B} and \textit{C} both have dynamic neighbours (each other), so they will not be filtered out. This algorithm removes the single-size false detections from the result of the separation.
 
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[height=50mm]{figures/raw/dynamic_points.png}
+    \caption{Point \textit{A} will be filtered out}
+    \label{dynamic_points}
+\end{figure}
+
+\subsection{Grouping}
+After the filtering, we can safely assumed that the elements in the dynamic point set are in fact points of a moving obstacle. The next step is grouping the corresponding dynamic points, and also adding those points to these groups that were prevoiusly marked as static, but they are part of a moving group. For example in \autoref{dynamic_points}, after the separation and filtering, only points \textit{B} and \textit{C} were marked dynamic, but actually, all the points in the image are points of the same object, that is moving. The grouping algorithm needs to be able to add these other points to the group as well.
+
+The grouping algorithm is based on the supposition that coherent points are close to each other, while the distance between points of separate objects is larger. With a few exceptions, this statement holds its stand, by practice it proved to be a reliable base for grouping. The algorithm itself is quite simple, it separates the list of measurements (including the static and dynamic poitns as well) into subsets - groups. A new group is started when the distance between two adjacent points is larger than the permitted maximum within a group. This maximum is an empirical constant, with experiments of valid use cases. The result of the step is shown in \autoref{groups}.
+
+\begin{figure}[!ht]
+    \centering
+    \subfloat[Gazebo simulation]
+    {
+        \includegraphics[height=46mm]{figures/raw/rviz_lidar_scan.png}
+        \label{gazebo_wall_following_car}
+    }
+    \subfloat[Groups]
+    {
+    \includegraphics[height=46mm]{figures/raw/groups.png}
+        \label{groups}
+    }
+    \caption{Distance-based grouping}
+    \label{wall_following_car}
+\end{figure}
+
+As it is clearly visible on the image, far points that are correspondent to the same object may be separated from each other, and grouped one by one - see the bottom right corner of the picture. However, the further an object is from the LIDAR, the less important it is for the local trajectory planner, which needs to avoid close obstacles. But still, they are not valid groups, so as the last step of the grouping mechanism, these single-point groups will be removed from the list of groups. But before doing that, there is still one special case that needs to be handled by the grouping unit - the \textit{wall following car}. Let's imagine the situation represented in \autoref{wall_following_car}. The detected obstacle (represented by the box) is moving alongside the wall, and within the maximum group point distance. Therefore, the grouping algorithm will join the groups. This wouldn't be a problem if the box wasn't moving, but as soon as it changes its position, grouping it together with the wall would ruin the mass center and speed vector calculation, described in \autoref{chap:tracking}.
+
+\begin{figure}[!ht]
+    \centering
+    \subfloat[Gazebo simulation]
+    {
+        \includegraphics[height=46mm]{figures/raw/gazebo_wall_following_car.png}
+        \label{gazebo_wall_following_car}
+    }
+    \subfloat[Lidar scan]
+    {
+    \includegraphics[height=46mm]{figures/raw/rviz_wall_following_car.png}
+        \label{rviz_wall_following_car}
+    }
+    \caption{The \textit{wall following car}}
+    \label{wall_following_car}
+\end{figure}
+
+To avoid this problem, the algorithm detects if an obstacle is unusually large, and cuts off long 'tails' from the group. Figure \autoref{group_cutting} explains this step in practice.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/raw/group_cutting.png}
+    \caption{Points on the left of \textit{B} will be cut off}
+    \label{group_cutting}
+\end{figure}
+
+Let's assume that the algorithm iterates through the points visualized in the figure from the right. The distance between points \textit{C} and \textit{D} is larger that the allowed maximum group point distance, therefore point \textit{C} starts a new group. Until the program reaches point \textit{A}, all the points are added to this group, because the distance between adjacent points is always lower than the maximum group point distance, but after point \textit{A}, the algorithm detects that the group is larger than the permitted limit. So the iteration turns around, and all the points are getting removed from the group, until the first dynamic point is reached - in the current example this would be point \textit{B}. As a result, only the points between (and including) point \textit{B} and point \textit{C} will be grouped together.
+
+As an undesired side-effect, this step may also remove some of those points from the group that are in fact parts of the moving object but were marked as static, because the removal only stops at the first \textit{dynamic} point.
 
 \subsection{Separation of static points and dynamic groups}
 
+The previous step has successfully sorted the measured points into groups, but it is undecided yet if these groups are moving or not. This decision is made by checking the number of dynamic points in each group, which must exceed the required minimum in order to the group being marked as dynamic.
+
+This was the last step of the separation of the groups, from this point, static points and dynamic groups will be handled differently.
 
 \section{Dynamic obstacles}
-After the dynamic groups have been separated from the static points, additional information needs to be calculated for them, so that the local track planner algorithm can use their data for its obstacle-avoidance feature.
+After the dynamic groups have been separated from the static points, additional information needs to be calculated for them, so that the local track planner algorithm can use their data for its obstacle-avoidance feature. 3 pieces of information are needed for each object, its position, size and speed vector. All of these are calculated from the object's mass center, which is the average of the group points. This mass center is considered to be the object's position in space.
 
-\subsection{Speed vectors}
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[height=50mm]{figures/raw/dynamic_information.png}
+    \caption{The calculated information for dynamic obstacles}
+    \label{dynamic_information}
+\end{figure}
 
+\subsection{Areas}
+First, the groups are substituted by bounding circles. The circle's radius is the distance between the farthest group point and the mass center. This simplification results in easier path calculation in the local planner, but also drops every information known about the obstacle's shape. For long objects, for instance, this method provides a very unrealistic image of the object, because the bounding circle is much larger than the obstacle itself. But for ususal shapes such as cars, the loss that the representation causes is less than the processing time we save with the simplification.
 
-\subsection{Area validation}
+\subsection{Tracking}
+\label{chap:tracking}
+Speed vectors are calculated from the change of the mass center between measurements. But in order to be able to check the mass center of a group in any previous measurement, object tracking is needed. The tracking is done by estimating each obstacles' current position based on their previous positions and speed vectors, and finding the best fit among the current groups. Filtering is also needed for such false detections when a previously detected object is not recognized for a few cycles. Without filtering, these obstacles would disappear from the list of groups for a period of time and then they would reappear, but tracking would fail. Therefore the algorithm keeps these objects alive for a given number of measurement periods, updating their positions with their last known speed vector in every cycle.
 
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=\textwidth]{figures/raw/tracking.png}
+    \caption{Object tracking}
+    \label{tracking}
+\end{figure}
+
+After the objects have been tracked, their speed vectors can be calculated. A filter is applied here, as well, for smoother obstacle paths.
 
 \subsection{Publishing dynamic obstacles}
+Dynamic obstacles - as outputs of the mapping node - are published on several topics, responsible for containing information for either further processing or visualization. The standard dynamic object structure in which moving objects are published to the local planner is not defined yet. The visualization messages, however, are implemented and in active use.
 
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[height=50mm]{figures/raw/rviz_moving_object.png}
+    \caption{Visualizing moving objects}
+    \label{rviz_moving_object}
+\end{figure}
+
+The published messages contain \textit{visualization\_msgs::Marker} instances with either \textit{SPHERE} or \textit{ARROW} instances with either \textit{SPHERE} or \textit{ARROW} type, thus representing the areas and speed vectors of the objects.
 
 \section{Static points}
 Static points used for two separate purposes. The first one is building a static map, the second is localization with the help of gmapping.
@@ -208,7 +294,7 @@ For static map-building, gmapping has already been mentioned as a candidate, but
     \label{gmapping_drawback_before_move}
 \end{figure}
 
-Figure \ref{gmapping_drawback_before_move} shows a situation where the ball is standing still. A the mapping algorithm of gmapping successfully creates a map (in the form of an occupancy grid\footnote{An occupancy grid represents a map in an evenly spaced field of probability values representing if the grid points are occupied by an obstacle}) that marks the place of the ball as occupied. However, when the ball starts moving (see figure \ref{gmapping_drawback_after_move}), the map does not change, because the algorithm cannot handle moving obstacles.
+\autoref{gmapping_drawback_before_move} shows a situation where the ball is standing still. The mapping algorithm of gmapping successfully creates a map (in the form of an occupancy grid\footnote{An occupancy grid represents a map in an evenly spaced field of probability values representing if the grid points are occupied by an obstacle}) that marks the place of the ball as occupied. However, when the ball starts moving (see \autoref{gmapping_drawback_after_move}), the map does not change, because the algorithm cannot handle moving obstacles.
 
 \begin{figure}[!ht]
     \centering
@@ -226,8 +312,101 @@ Figure \ref{gmapping_drawback_before_move} shows a situation where the ball is s
     \label{gmapping_drawback_after_move}
 \end{figure}
 
+Due to the above problem, static map-building needed to be implemented internally, which is basically a 2D occupancy grid. The grid points' possible values are the following:
 
-\subsection{Remapping to LIDAR scan}
+\begin{center}
+    \begin{tabular}{ c c }
+        \includegraphics[height=3mm]{figures/raw/map_occupied.png} & Occupied (value: 100) \\
+        \includegraphics[height=3mm]{figures/raw/map_unknown.png}  & Unknown (value: 50)   \\
+        \includegraphics[height=3mm]{figures/raw/map_free.png}     & Free (value: 0)       \\
+    \end{tabular}
+\end{center}
 
+I chose the most straight-forward way of map-building - each static measurement introduces an occupied point and a free ray in the map. \autoref{map_ray} visualizes the situation. The green and red grids are the car's current position and the measured point.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[height=50mm]{figures/raw/map_ray.png}
+    \caption{Introducing a free ray}
+    \label{map_ray}
+\end{figure}
 
 \subsection{Publishing static scan}
+As I mentioned already, gmapping is not used as a primary map-builder node, but its localization is still useful, therefore LIDAR measurements still need to be published for it. As the algorithm already separated the static points from the dynamic ones, it is handy to publish only the static measurements to gmapping. So in this step, a new scan structure is created, but the dynamic points are not added to it, only the static ones.
+
+\section{Conclusion}
+As a conclusion of the mapping sub-project, I present an example with a valid use-case. The scenario is the following. The car is standing in a closed room, the distance from the walls are smaller than the LIDAR's range. There is one other object in the room, in the simulation, this is a ball, its size similar to the car's. The ball is standing in one place at first, but after a while, it start moving in a straight path with constant speed. Finally, the car starts moving as well - first in a straight path, then turning.
+
+\autoref{mapping_demo_start} presents the initial situation of the demonstration. The left image shows the simulation - the car is standing in the middle of the room, the object in the top left corner is not moving yet. On the right image, the created static map is visible. The number of unknown (grey) grid points is large at this state of the simulation, it will dramatically decrease once the car starts moving. This effect is caused by the LIDAR's finite angular resolution and ray characteristics. The black grid points represent statically occupied positions. All the walls are marked static, and the ball as well.
+
+\begin{figure}[!ht]
+    \centering
+    \subfloat[Gazebo simulation]
+    {
+        \includegraphics[height=70mm]{figures/raw/mapping_demo/gazebo_start.png}
+        \label{mapping_demo_gazebo_start}
+    }
+    \subfloat[rviz visualization]
+    {
+    \includegraphics[height=70mm]{figures/raw/mapping_demo/rviz_start.png}
+        \label{mapping_demo_rviz_start}
+    }
+    \caption{Initial state - ball is still}
+    \label{mapping_demo_start}
+\end{figure}
+
+Once the ball starts moving (\autoref{mapping_demo_ball_moving}), it stops being marked as static, but is handled as a moving object. The static block at the top left corner has been removed, and the ball is displayed using the dynamic visualization toolset - a sphere and an arrow, representing the ball's area and speed vector.
+
+\begin{figure}[!ht]
+    \centering
+    \subfloat[Gazebo simulation]
+    {
+        \includegraphics[height=70mm]{figures/raw/mapping_demo/gazebo_ball_moving.png}
+        \label{mapping_demo_gazebo_ball_moving}
+    }
+    \subfloat[rviz visualization]
+    {
+    \includegraphics[height=70mm]{figures/raw/mapping_demo/rviz_ball_moving.png}
+        \label{mapping_demo_rviz_ball_moving}
+    }
+    \caption{The ball is moving}
+    \label{mapping_demo_ball_moving}
+\end{figure}
+
+When the car starts moving, the map immediately starts to clear out. If we compare \autoref{mapping_demo_ball_moving} and \autoref{mapping_demo_car_moving}, it is clear that the latter contains less unknown grid points. The dynamic object-tracking is still operating without error, the ball's speed vector is correct.
+
+\begin{figure}[!ht]
+    \centering
+    \subfloat[Gazebo simulation]
+    {
+        \includegraphics[height=70mm]{figures/raw/mapping_demo/gazebo_car_moving.png}
+        \label{mapping_demo_gazebo_car_moving}
+    }
+    \subfloat[rviz visualization]
+    {
+    \includegraphics[height=70mm]{figures/raw/mapping_demo/rviz_car_moving.png}
+        \label{mapping_demo_rviz_car_moving}
+    }
+    \caption{The car is moving}
+    \label{mapping_demo_car_moving}
+\end{figure}
+
+However, as soon as the car starts turning instead of moving in a straight trajectory, the measurements become very noisy. \autoref{mapping_demo_car_turning} demonstrates the situation. The simulation image (left) shows that the LIDAR scan has a rotational error. Reflecting to this noise, the static-dynamic separation and tracking do not work properly, the algorithm keeps losing objects and then finding them again. It is also visible on the right-hand image, that the rotational error has undesired effects in the static map. The walls are duplicated and are not necessarily at their correct position.
+
+\begin{figure}[!ht]
+    \centering
+    \subfloat[Gazebo simulation]
+    {
+        \includegraphics[height=70mm]{figures/raw/mapping_demo/gazebo_car_turning.png}
+        \label{mapping_demo_gazebo_car_turning}
+    }
+    \subfloat[rviz visualization]
+    {
+    \includegraphics[height=70mm]{figures/raw/mapping_demo/rviz_car_turning.png}
+        \label{mapping_demo_rviz_car_turning}
+    }
+    \caption{The car is turning}
+    \label{mapping_demo_car_turning}
+\end{figure}
+
+Due to the above mentioned problems, the mapping node can only be used with certain limitations regarding obstacle speed and the car's angular velocity. These problems will be solved in the future, using more leniant filtering for existing dynamic groups and a more advanced static mapping algorithm.
