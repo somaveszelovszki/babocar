@@ -10,6 +10,9 @@
 [submodule "modules/babocar-logic"]
 	path = modules/babocar-logic
 	url = git@github.com:somaveszelovszki/babocar-logic.git
-[submodule "modules/babocar-test"]
-	path = modules/babocar-test
-	url = git@github.com:somaveszelovszki/babocar-test.git
+[submodule "modules/babocar-3d_models"]
+	path = modules/babocar-3d_models
+	url = git@github.com:somaveszelovszki/babocar-3d_models.git
+[submodule "modules/babocar-monitor"]
+	path = modules/babocar-monitor
+	url = git@github.com:somaveszelovszki/babocar-monitor.git
