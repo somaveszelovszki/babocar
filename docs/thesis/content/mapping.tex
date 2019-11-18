@@ -9,7 +9,7 @@ In order to create two disjunct maps, one static and one dynamic, the key elemen
 
 \tikzset{
      base_node/.style = {rectangle, rounded corners, draw=black,
-                         minimum width=5cm, minimum height=1cm,
+                         minimum width=4.5cm, minimum height=1cm,
                          text centered, font=\sffamily},
   inout_node/.style   = {base_node, fill=blue!30},
   common_node/.style  = {base_node, fill=orange!15},
@@ -25,8 +25,9 @@ In order to create two disjunct maps, one static and one dynamic, the key elemen
     \begin{tikzpicture}[
             node distance=1.5cm,
             every node/.style={fill=white, font=\sffamily}, align=center]
-        % Node descriptions
+        % Input node
         \node (scan)            [inout_node]                                   {Input scan};
+        % Common nodes
         \node (convert_abs)     [common_node, below of=scan]                   {Convert to absolute points};
         \node (dynamic_points)  [common_node, below of=convert_abs]            {Find dynamic points};
         \node (groups)          [common_node, below of=dynamic_points]         {Make dynamic groups};
@@ -38,7 +39,7 @@ In order to create two disjunct maps, one static and one dynamic, the key elemen
         % Static nodes
         \node (update_map)      [static_node, below of=separate, xshift=3cm]   {Update static map};
         \node (publish_static)  [inout_node, below of=update_map]              {Publish static scan};
-        % Connections
+        % Common connections
         \draw[->]           (scan) -- (convert_abs);
         \draw[->]    (convert_abs) -- (dynamic_points);
         \draw[->] (dynamic_points) -- (groups);
@@ -62,7 +63,7 @@ In order to create two disjunct maps, one static and one dynamic, the key elemen
     \label{mapping_method}
 \end{figure}
 
-The diagram consists of 3 subgraphs - these are also marked on the diagram. The first, and most important is the separation and grouping of dynamic points. The second section describes the additional calculations that need to be done for the dynamic obstacles, and consists the documentation for the message structure definining these dynamic obstacles. The third section is about the static map that is built from the static points. The next sections are going to explain these subgraphs in detail.
+The diagram consists of 3 subgraphs - these are also marked on the diagram. The first, and most important is the separation and grouping of dynamic points. The second subgraph describes the additional calculations that need to be done for the dynamic obstacles, and consists the documentation for the message structure definining these dynamic obstacles. And the third one is about the static map that is built from the static points. The next sections are going to explain these subgraphs in detail.
 
 \section{Separation and grouping}
 \label{chap:separation_and_grouping}
@@ -373,7 +374,7 @@ Once the ball starts moving (\autoref{mapping_demo_ball_moving}), it stops being
     \label{mapping_demo_ball_moving}
 \end{figure}
 
-When the car starts moving, the map immediately starts to clear out. If we compare \autoref{mapping_demo_ball_moving} and \autoref{mapping_demo_car_moving}, it is clear that the latter contains less unknown grid points. The dynamic object-tracking is still operating without error, the ball's speed vector is correct.
+When the car starts moving, the map immediately starts to clear out. If we compare \autoref{mapping_demo_ball_moving} and \autoref{mapping_demo_car_moving}, it is clear that the latter contains less unknown grid points.
 
 \begin{figure}[!ht]
     \centering
@@ -391,22 +392,4 @@ When the car starts moving, the map immediately starts to clear out. If we compa
     \label{mapping_demo_car_moving}
 \end{figure}
 
-However, as soon as the car starts turning instead of moving in a straight trajectory, the measurements become very noisy. \autoref{mapping_demo_car_turning} demonstrates the situation. The simulation image (left) shows that the LIDAR scan has a rotational error. Reflecting to this noise, the static-dynamic separation and tracking do not work properly, the algorithm keeps losing objects and then finding them again. It is also visible on the right-hand image, that the rotational error has undesired effects in the static map. The walls are duplicated and are not necessarily at their correct position.
-
-\begin{figure}[!ht]
-    \centering
-    \subfloat[Gazebo simulation]
-    {
-        \includegraphics[height=70mm]{figures/raw/mapping_demo/gazebo_car_turning.png}
-        \label{mapping_demo_gazebo_car_turning}
-    }
-    \subfloat[rviz visualization]
-    {
-    \includegraphics[height=70mm]{figures/raw/mapping_demo/rviz_car_turning.png}
-        \label{mapping_demo_rviz_car_turning}
-    }
-    \caption{The car is turning}
-    \label{mapping_demo_car_turning}
-\end{figure}
-
-Due to the above mentioned problems, the mapping node can only be used with certain limitations regarding obstacle speed and the car's angular velocity. These problems will be solved in the future, using more leniant filtering for existing dynamic groups and a more advanced static mapping algorithm.
+Due to the map implementation being very simple, and updating each map point without handling its history, the mapping node can only be used with certain limitations regarding obstacle speed and the car's angular velocity. But the main task for the mapping algorithm was not to create a static map with the best possible quality, but to separate the static points from the dynamic objects.
