@@ -85,8 +85,19 @@ The diagram consists of 4 subgraphs - these are also marked on the diagram with 
 
 \section{Static velocity obstacle map}
 \label{chap:static_velocity_obstacle_map}
+Static points in the map populate a very large percent of the car's surroundings, so handling them efficiently can boost up the algorithms runtime performance. Therefore, they are not joined with the dynamic points, but filtered separately, and the collision times are calculated in a way that is optimized for non-moving objects to gain performance.
 
 \subsection{Filtering static points}
+Separating the static points from the dynamic objects has both advantages and disadvantages for local motion planning. The most important advantage is that the collision check with static points is much simpler and faster than with dynamic obstacles. A great disadvantage, however, is that the static map contains lots of points, and running a collision check on all of them would cause the algorithm to be unacceptably slow. To prevent this undesired behaviour, a preparatory filter is applied to the map, removing those points from the map, that are too far from the car's current position to be worth keeping. Depending on the environment's characteristics, this step may reduce the runtime of the static collision times drastically - even to zero, if all the static points are far from the car (e.g. in a large room).
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[height=110mm]{figures/raw/rviz_2_near_static_objects_filter.png}
+    \caption{Static filtering}
+    \label{rviz_2_near_static_objects_filter}
+\end{figure}
+
+Figure \ref{rviz_2_near_static_objects_filter} shows that the mapped environment of the car is a much larger territory than what the motion planning algorithm needs to check for collisions. The circle marks the area that is kept after the filtering. In this example, this area contains the two square-shaped obstacles, all the other points in the static map are thrown.
 
 \subsection{Static collision times}
 
