@@ -81,7 +81,67 @@ The next graph shows all the sub-tasks of the local trajectory planner algorithm
     \label{motion_planning_method}
 \end{figure}
 
-The diagram consists of 4 subgraphs - these are also marked on the diagram with different colors. The first (and shortest) one is about the method of reducing the size of the static map by filtering out those points that are not needed for the trajectory planning. The second one shows that for dynamic objects, trajectory calculation is also necessary besides filtering. The third describes the environment-independent sub-tasks of the algorithm - finding the next destination point, updating the target actuation and the dynamic window. And the last subgraph (populating the bottom area of the graph) contains the main planning logic. The next sections are going to explain these subgraphs in detail.
+The diagram consists of 4 subgraphs - these are also marked on the diagram with different colors. The orange subgraph describes the environment-independent sub-tasks of the algorithm - finding the next destination point, updating the target actuation and the dynamic window. The yellow one is about the method of reducing the size of the static map by filtering out those points that are not needed for the trajectory planning. The red side subgraph shows that for dynamic objects, trajectory calculation is also necessary besides filtering. And the last one (populating the bottom area of the graph, marked with green colour) contains the main planning logic. The next sections are going to explain these subgraphs in detail.
+
+\section{Target actuation and dynamic window}
+\label{chap:target_actuation_and_dynamic_window}
+In every loop (at each new incoming map data), the target actuation and the dynamic window are updated. The target actuation describes the desired speed and steering wheel angle for the next step, therefore the desired linear and angular speed vectors. The dynamic window is independent from the target actuation, but depends on the current actuation. It contains a set of speeds and wheel angles that are reachable by the car within the next step. The width and height of the window (the maximum speed and wheel angle change in one step) are defined by the mechanical characteristics of the car.
+So basically, the aim of this subtask is to provide the algorithm a target actuation, and a set of reachable actuations.
+When I implemented the target actuation update mechanism, that leads the car according to the input trajectory, I had several options to choose from. The first option was to split the trajectory into line-segments, and implement and tune a steering angle controller (e.g. a PD controller) to follow this line. I dropped this idea to prevent the re-tuning that would have been needed for each target vehicles (simulation, real-life test vehicles). Another option was the 'invisible string' the 'dog bone' method, where a target destination point is always in front of the car, and the car is always trying to reach this point, as if the point was pulling it by a string. The target actuation's wheel angle defines a trajectory curve, that goes through the destination point. If the destination point is always on the trajectory, and in front of car (within the right distance range), the car is goint to follow the trajectory. I chose the latter (the 'invisible string') method.
+
+\subsection{Finding the next destination point}
+This method requires a destination point in each iteration. This point is preferably on the trajectory, in front of the car, 'pulling' the car to the right direction. The destination point search start with finding the point in the trajectory nearest to the car's current position. The destination point needs to be in front of the car, but its distance from the car (which is nearly equal to its distance from the previously found nearest point) is not trivial (see figure \ref{dest_point_update}).
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[height=48mm]{figures/raw/dest_point_update.png}
+    \caption{Updating the destination point}
+    \label{dest_point_update}
+\end{figure}
+
+Choosing a too near destination will result in the car starting to oscillate around the target trajectory with an increasing amplitude, until a point where the angular difference between the car and the trajectory will be too large for the car to find the path again. This situation is displayed in figure \ref{traj_oscillation}.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=65mm]{figures/raw/traj_oscillation.png}
+    \caption{Oscillation around the target trajectory}
+    \label{traj_oscillation}
+\end{figure}
+
+However, the destination point must not be chosen too far, either, because it straightens the curves of the trajectory, rounds its sharp edges, and adds an offset to the long circular sections. Figure \ref{traj_rounding} demonstrates these effects. The effect shown on the left side might even be advantageous, but the righ-hand side effect is certainly not.
+
+\begin{figure}[!ht]
+    \centering
+    \subfloat[Rounding sharp peaks]
+    {
+        \includegraphics[height=48mm]{figures/raw/traj_round_sharp_peak.png}
+        \label{traj_round_sharp_peak}
+    }
+    \subfloat[Rounding curves]
+    {
+    	\includegraphics[height=48mm]{figures/raw/traj_round_curve.png}
+        \label{traj_round_curve}
+    }
+    \caption{Trajectory rounding}
+    \label{traj_rounding}
+\end{figure}
+
+After empirical testing, the optimal distance of the destination point and the nearest trajectory point (marked with yellow and black dots in figure \ref{dest_point_update}) proved to be around 4 times the distance between the car's front and rear axles. Note, that this value largely depends on the dynamic window's maximum angular velocity limit and the car's mechanical characteristics (e.g. using a faster steering servo or a 4-wheel steering car would reduce the optimal distance).
+
+\subsection{Calculating the target actuation}
+After the destination point has been selected, the next step is to calculate the target actuation - the speed and steering angle pair that would lead the car to the destination point. First, the target wheel angle is calculated using linear algebra (see figure \ref{calc_steering_angle}). The target speed calculation is based on two factors. The first is the target speed limit, which we expect the car to keep, given no extraordinary circumstances. This should be set to a safe speed that the car can keep up during its travel. The actual target speed will never exceed this limit. But the target steering angle may require this target speed to be lower. Trivially, the car can manage to reach higher speeds safely when going straight, than when in a sharp bend.
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[height=48mm]{figures/raw/calc_steering_angle.png}
+    \caption{Calculating the target steering angle}
+    \label{calc_steering_angle}
+\end{figure}
+
+\subsection{Updating the dynamic window}
+
+\section{Target actuation}
+\label{chap:target_actuation}
 
 \section{Static velocity obstacle map}
 \label{chap:static_velocity_obstacle_map}
@@ -100,6 +160,9 @@ Separating the static points from the dynamic objects has both advantages and di
 Figure \ref{rviz_2_near_static_objects_filter} shows that the mapped environment of the car is a much larger territory than what the motion planning algorithm needs to check for collisions. The circle marks the area that is kept after the filtering. In this example, this area contains the two square-shaped obstacles, all the other points in the static map are thrown.
 
 \subsection{Static collision times}
+Collision times
+Due to the fact that the number of static points is usually high compared to the dynamic points, the collision times are calculated separately, so that the calculation can be optimized for static objects. Collision check with static objects is executed the following way.
+The 
 
 \section{Dynamic velocity obstacle map}
 \label{chap:dynamic_velocity_obstacle_map}
