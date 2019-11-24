@@ -1,4 +1,10 @@
 \chapter{Mapping}
+\label{chap:mapping}
+
+\section{Existing implementations}
+This chapter decribes the process of building a separate static and a dynamic map (containing non-moving and moving obstacles, respectively) based on radial distance measurements (in this case provided by a LIDAR). Isolating the static and the moving obstacles from each other has its difficulties but also its advantages. First of all, the implemented local track planner calculates safer, more optimized paths if it is informed of both the static and the dynamic obstacles along the path. Secondly, \href{https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping}{SLAM} (Simultaneous localization and mapping) algorithms work better if the their input contains only static objects in the space, because they build an internal map of the world. Passing detections of moving obstacles to a SLAM algorithm may lead to worse localization quality, as they may ruin this map.
+
+As a first subtask of the mapping project, I checked if any implementation is avaiable already, that can handle dynamic objects. The only possible candidate was \href{http://wiki.ros.org/gmapping}{gmapping}, which is a popular ROS package, used in a wide variety of applications that require map-building and localization. Its SLAM algorithm takes LIDAR measurements as its input and generates an occupancy grid (a 2D map) of the car's environment. By using this map it is able to make corrections to the car's odometry-based position and orientation, which is usually inaccurate. I tried out the package, and the result maps were promising, the generated map was insensitive to the car's longitudinal movements and its rotations. But unfortunately, gmapping's SLAM does not support dynamic objects. See \autoref{chap:static_map} for further details. Therefore, gmapping could not be used as the producer of the static map. But that didn't mean it couln't be used for its second feature, localization. Note, that the mapping implementation I made is not a SLAM algorithm, it is not able to make corrections to the car's pose. So for that purpose, I still needed the help of gmapping, which proved to be very reliable at localization. But the static map-building needed to be implemented internally.
 
 \section{Method}
 This chapter decribes the process of building a separate static and a dynamic map (containing non-moving and moving obstacles, respectively) based on radial distance measurements (in this case provided by a LIDAR). Isolating the static and the moving obstacles from each other has its difficulties but also its advantages. First of all, the implemented local track planner calculates safer, more optimized paths if it is informed of both the static and the dynamic obstacles along the path. Secondly, \href{https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping}{SLAM} (Simultaneous localization and mapping) algorithms work better if the their input contains only static objects in the space, because they build an internal map of the world. Passing detections of moving obstacles to a SLAM algorithm may lead to worse localization quality, as they may ruin this map.
@@ -63,7 +69,27 @@ In order to create two disjunct maps, one static and one dynamic, the key elemen
     \label{mapping_method}
 \end{figure}
 
-The diagram consists of 3 subgraphs - these are also marked on the diagram. The first, and most important is the separation and grouping of dynamic points. The second subgraph describes the additional calculations that need to be done for the dynamic obstacles, and consists the documentation for the message structure definining these dynamic obstacles. And the third one is about the static map that is built from the static points. The next sections are going to explain these subgraphs in detail.
+The diagram consists of 3 subgraphs - these are also marked on the diagram. The first, and most important is the separation and grouping of dynamic points. The second subgraph describes the additional calculations that need to be done for the dynamic obstacles, and consists the documentation for the message structure definining these dynamic obstacles. And the third one is about the static map that is built from the static points. The sections under \ref{chap:mapping} explain these subgraphs in detail.
+
+\section{Input parameters}
+\label{chap:input_parameters}
+The following input parameters can manipulate the mapping node:
+
+\textbf{LIDAR\_MAX\_DIST} [meter]
+
+The maximum measurable distance by the LIDAR(s). Depends on the LIDAR's characteristics.
+
+\textbf{MAP\_RES} [meter]
+
+The resolution of the built static map. Increasing this this value helps building a better quality map, but also increases the node's resource need.
+
+\textbf{MAP\_SIZE} [meter]
+
+The size of the built static map. Increasing this this value helps building a better quality map, but also increases the node's resource need.
+
+\textbf{SINGLE\_LIDAR} [boolean]
+
+Defines if the node's input is one LIDAR scan, or a separate front and rear scan that needs to be handled separately.
 
 \section{Separation and grouping}
 \label{chap:separation_and_grouping}
@@ -323,7 +349,7 @@ Due to the above problem, static map-building needed to be implemented internall
     \end{tabular}
 \end{center}
 
-I chose the most straight-forward way of map-building - each static measurement introduces an occupied point and a free ray in the map. \autoref{map_ray} visualizes the situation. The green and red grids are the car's current position and the measured point.
+I chose the most straight-forward way of map-building - each static measurement introduces an occupied point and a free ray in the map. The map's size and resolution can be set as input parameters (see MAP\_SIZE and MAP\_RES in \ref{chap:input_parameters}). \autoref{map_ray} visualizes the situation. The green and red grids are the car's current position and the measured point.
 
 \begin{figure}[!ht]
     \centering
