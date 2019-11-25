@@ -26,7 +26,7 @@ Given this velocity obstacle map, the algorithm has a basic knowledge of the rea
      base_node/.style = {rectangle, rounded corners, draw=black,
                          minimum width=4.5cm, minimum height=1cm,
                          text centered, font=\sffamily},
-  inout_node/.style        = {base_node, fill=blue!30},
+  inout_node/.style    = {base_node, fill=blue!30, minimum width=3.0cm},
   update_node/.style   = {base_node, fill=orange!15},
   dynamic_node/.style  = {base_node, fill=red!30},
   static_node/.style   = {base_node, fill=yellow!30},
@@ -42,29 +42,31 @@ Given this velocity obstacle map, the algorithm has a basic knowledge of the rea
             node distance=1.5cm,
             every node/.style={fill=white, font=\sffamily}, align=center]
         % Input nodes
-        \node (static_map)      [inout_node, yshift=-3cm]                              {Static map};
-        \node (trajectory)      [inout_node, xshift=5.2cm]                             {Input trajectory};
-        \node (dynamic_objects) [inout_node, xshift=10.4cm, yshift=-1.5cm]             {Dynamic objects};
+        \node (static_map)      [inout_node]                                            {Static map};
+        \node (trajectory)      [inout_node, xshift=3.5cm]                              {Input trajectory};
+        \node (control)         [inout_node, xshift=7.0cm]                              {Control};
+        \node (dynamic_objects) [inout_node, xshift=10.5cm]                             {Dynamic objects};
         % Update nodes
-        \node (find_dest)       [update_node, below of=trajectory]                     {Find destination};
-        \node (calc_target_act) [update_node, below of=find_dest]                      {Calculate target actuation};
-        \node (update_window)   [update_node, below of=calc_target_act]                {Update dynamic window};
+        \node (find_dest)       [update_node, below of=trajectory, xshift=1.75cm]       {Find destination};
+        \node (calc_target_act) [update_node, below of=find_dest]                       {Calculate target actuation};
+        \node (update_window)   [update_node, below of=calc_target_act]                 {Update dynamic window};
 		% Static nodes
-        \node (static_filter)   [static_node, below of=static_map]                     {Filter};
-        \node (static_calc_col) [static_node, below of=static_filter]                  {Calculate collision times};
+        \node (static_filter)   [static_node, below of=static_map, yshift=-3cm]         {Filter};
+        \node (static_calc_col) [static_node, below of=static_filter]                   {Calculate collision times};
 		% Dynamic nodes
-        \node (dynamic_filter)  [dynamic_node, below of=dynamic_objects]               {Filter};
-        \node (dynamic_traj)    [dynamic_node, below of=dynamic_filter]                {Calculate trajectories};
-        \node (dyn_calc_col)    [dynamic_node, below of=dynamic_traj]                  {Calculate collision times};
+        \node (dynamic_filter)  [dynamic_node, below of=dynamic_objects, yshift=-1.5cm] {Filter};
+        \node (dynamic_traj)    [dynamic_node, below of=dynamic_filter]                 {Calculate trajectories};
+        \node (dyn_calc_col)    [dynamic_node, below of=dynamic_traj]                   {Calculate collision times};
         % Velocity obstacle nodes
-        \node (fitness_factors) [velo_obs_node, below of=update_window, yshift=-1.5cm] {Update fitness factors};
-        \node (get_best_act)    [velo_obs_node, below of=fitness_factors]              {Get best actuation};
-        \node (acker_drive)     [inout_node, below of=get_best_act]                    {Publish Ackermann drive};
+        \node (fitness_factors) [velo_obs_node, below of=update_window, yshift=-1.5cm]  {Update fitness factors};
+        \node (get_best_act)    [velo_obs_node, below of=fitness_factors]               {Get best actuation};
+        \node (acker_drive)     [inout_node, below of=get_best_act]                     {Publish Ackermann drive};
         % Static connections
         \draw[->]      (static_map) -- (static_filter);
         \draw[->]   (static_filter) -- (static_calc_col);
         % Update connections
         \draw[->]      (trajectory) -- (find_dest);
+        \draw[->]         (control) -- (find_dest);
         \draw[->]       (find_dest) -- (calc_target_act);
         \draw[->] (calc_target_act) -- (update_window);
         \draw[->]   (update_window) -- (static_calc_col);
@@ -85,6 +87,7 @@ Given this velocity obstacle map, the algorithm has a basic knowledge of the rea
 
 The diagram consists of 4 subgraphs - these are also marked on the diagram with different colors. The orange subgraph describes the environment-independent sub-tasks of the algorithm - finding the next destination point, updating the target actuation and the dynamic window. The yellow one is about the method of reducing the size of the static map by filtering out those points that are not needed for the trajectory planning. The red side subgraph shows that for dynamic objects, trajectory calculation is also necessary besides filtering. And the last one (populating the bottom area of the graph, marked with green colour) contains the main planning logic. The sections under \ref{chap:motion_planning} explain these subgraphs in detail.
 
+\begin{minipage}{\textwidth}
 \section{Input parameters}
 \label{chap:input_parameters}
 The following input parameters can manipulate the motion planning node:
@@ -156,6 +159,7 @@ The weight of the safety factor when finding the best possible actuation.
 \textbf{W\_SPEED\_FACTOR} [dimensionless]
 
 The weight of the speed factor when finding the best possible actuation.
+\end{minipage}
 
 \section{Target actuation and dynamic window}
 \label{chap:target_actuation_and_dynamic_window}
@@ -214,11 +218,13 @@ After the destination point has been selected, the next step is to calculate the
 \end{figure}
 
 \subsection{Updating the dynamic window}
-In every iteration, the dynamic window must also be updated, which is independent from the target actuation, but depends on the current actuation. The 'width' and 'height' of the window (which is defined by the maximum speed and wheel angle change in one iteration) mostly depends on the car's physical, mechanical and other characteristics (motor-wheel dead-time, maximum motor torque, speed controller's parameters, maximum angular velocity of the steering servo), but the environment's characteristics (air resistance, friction) also influence them. The maximum speed and wheel angle change are settable parameters (see MAX\_ACCELERATION and MAX\_WHEEL\_ANGULAR\_VELOCITY in \ref{chap:input_parameters}). The dynamic window is represented in figure \ref{dynamic_window}. The red arrow shows the current actuation (speed and wheel angle pair). The dynamic window itself appears on the image as the grey area under the arrow heads. Every actuation within the dynamic window's area is reachable within the next step. When the current actuation is not near a hard limit, it is the center of the dynamic window.
+In every iteration, the dynamic window must also be updated, which is independent from the target actuation, but depends on the current actuation, which is obtained by reading the odometry message published another node in the car. I have already described the structure of the \href{http://docs.ros.org/melodic/api/nav_msgs/html/msg/Odometry.html}{\textit{\textit{nav\_msgs/Odometry}}} message earlier in \ref{chap:absolute_points}.
+
+The 'width' and 'height' of the window (which is defined by the maximum speed and wheel angle change in one iteration) mostly depends on the car's physical, mechanical and other characteristics (motor-wheel dead-time, maximum motor torque, speed controller's parameters, maximum angular velocity of the steering servo), but the environment's characteristics (air resistance, friction) also influence them. The maximum speed and wheel angle change are settable parameters (see MAX\_ACCELERATION and MAX\_WHEEL\_ANGULAR\_VELOCITY in \ref{chap:input_parameters}). The dynamic window is represented in figure \ref{dynamic_window}. The red arrow shows the current actuation (speed and wheel angle pair). The dynamic window itself appears on the image as the grey area under the arrow heads. Every actuation within the dynamic window's area is reachable within the next step. When the current actuation is not near a hard limit, it is the center of the dynamic window.
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=48mm]{figures/raw/dynamic_window.png}
+    \includegraphics[height=60mm]{figures/raw/dynamic_window.png}
     \caption{The dynamic window}
     \label{dynamic_window}
 \end{figure}
@@ -226,18 +232,18 @@ In every iteration, the dynamic window must also be updated, which is independen
 However, the size of the dynamic window may reduce when its size is limited by the hard limits of speed and wheel angle. A perfect example for this situation is when the steering angle is at its maximum at either left or right direction (see MAX\_WHEEL\_ANGLE in \ref{chap:input_parameters}), in which case changing the angle further to this direction is impossible. This results in the dynamic window getting halved - as only its original right or left side is reachable, depending on the current steering direcion. It is trivial that in these cases such as the previous example, the current actuation is no longer in the center of the dynamic winow.
 Another important characteristics of the dynamic window is its resolution - both speed and angular velocity, which are settable parameters (see DYNAMIC\_WINDOW\_SPEED\_RESOLUTION and DYNAMIC\_WINDOW\_ANGLE\_RESOLUTION in \ref{chap:input_parameters}). Increasing the resolution leads to smoother control, but also increases the node's resource need and runtime.
 
-The managing the dynamic window internally, the motion planning node also publishes the dynamic window's possible actuations, so that it can be viewed on-the-fly in rviz.
+The managing the dynamic window internally, the motion planning node also publishes the dynamic window's possible actuations in a \href{http://docs.ros.org/melodic/api/visualization_msgs/html/msg/MarkerArray.html}{\textit{visualization\_msgs::MarkerArray}} on topic \textit{available\_velocities}, so that they can be viewed on-the-fly in rviz.
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=48mm]{figures/raw/rviz_available_velocities.png}
+    \includegraphics[height=60mm]{figures/raw/rviz_available_velocities.png}
     \caption{Available velocities in rviz}
     \label{rviz_available_velocities}
 \end{figure}
 
 \section{Static velocity obstacle map}
 \label{chap:static_velocity_obstacle_map}
-Static points in the map populate a very large percent of the car's surroundings, so handling them efficiently can boost up the algorithms runtime performance. Therefore, they are not joined with the dynamic points, but filtered separately, and the collision times are calculated in a way that is optimized for non-moving objects to gain performance.
+Static points in the map are received from the mapping node in \href{http://docs.ros.org/melodic/api/nav_msgs/html/msg/OccupancyGrid.html}{\textit{nav\_msgs/OccupancyGrid}} messages on topic \textit{static\_grid} (see (see \ref{chap:publishing_static_points})), and they populate a very large percent of the car's surroundings, so handling them efficiently can boost up the algorithms runtime performance. Therefore, they are not joined with the dynamic points, but filtered separately, and the collision times are calculated in a way that is optimized for non-moving objects to gain performance.
 
 \subsection{Filtering static points}
 Separating the static points from the dynamic objects has both advantages and disadvantages for local motion planning. The most important advantage is that the collision check with static points is much simpler and faster than with dynamic obstacles. A great disadvantage, however, is that the static map contains lots of points, and running a collision check on all of them would cause the algorithm to be unacceptably slow. To prevent this undesired behaviour, a preparatory filter is applied to the map, removing those points from the map, that are too far from the car's current position to be worth keeping. Depending on the environment's characteristics, this step may reduce the runtime of the static collision times drastically - even to zero, if all the static points are far from the car (e.g. in a large room).
@@ -341,6 +347,7 @@ Using the method described above, the collision times for the static obstacles i
 
 \section{Dynamic velocity obstacle map}
 \label{chap:dynamic_velocity_obstacle_map}
+Dynamic obstacles are also obtained from the mapping node, on topic \textit{dynamic\_objects} (see \ref{chap:publishing_dynamic_obstacles}).
 Handling dynamic obstacles is more difficult than handling static points, the algorithm, however, evaluating the moving objects is more straight-forward than static method using linear algebra. The reason for the dynamic algorithm being easier to comprehend is that it uses an iterative approach instead of linear algebra. (Linear algebra with multiple objects moving in non-straight paths is not trivial.)
 
 \subsection{Filtering dynamic objects}
@@ -421,6 +428,7 @@ the following statement is always true:
 
 which was the number trajectory simulation time steps for the surrounding obstacles (see \ref{trajectory_calculation}). Therefore, it is provided that all objects in the environment have a pre-calculated trajectory for the whole collision check simulation interval.
 
+\begin{minipage}{\textwidth}
 \section{Velocity obstacle map evaluation}
 \label{chap:velocity_obstacle_map_evaluation}
 Let me summarize briefly what the algorithm has done so far.
@@ -435,6 +443,7 @@ In each iterations, the algorithm:
   \item checked all available actuations for collisions with any of the static or dynamic objects
   \item built a velocity obstacle map using these collision times
 \end{enumerate}
+\end{minipage}
 
 Now the next (and final) step is to evaluate the velocity obstacle map, and find the best actuation. But defining what 'the best' actuation is is not trivial.
 Let's look at the scenario represented in figure \ref{what_is_the_best_actuation}.
@@ -446,11 +455,12 @@ Let's look at the scenario represented in figure \ref{what_is_the_best_actuation
     \label{what_is_the_best_actuation}
 \end{figure}
 
-The target trajectory is a straight line (marked with the green line in the rviz visualization, published by the motion planning node). But there is an ostacle in the way. Without the obstacle being in the picture, one could state without hesitation, the the target actuation is always the one the keeps the car on the line. But once the object is there, this is no longer the case. Defining the best actuation to be the one that keeps car in direction would lead to collision, obviously, the car needs to steer to the right to avoid that. But this raises even more questions. \textit{Should the car steer to the right long before the object? Is it enough to turn the wheels in the last moment? Are we sure we are able to steer away from collision, isn't an emergency brake a better solution?} I answered these questions and solved the problem of finding the best actuation with the introduction of fitness factors.
+The target trajectory is a straight line (marked with the green line in the rviz visualization, published by the motion planning node on topic \textit{global\_trajectory}). But there is an ostacle in the way. Without the obstacle being in the picture, one could state without hesitation, the the target actuation is always the one the keeps the car on the line. But once the object is there, this is no longer the case. Defining the best actuation to be the one that keeps car in direction would lead to collision, obviously, the car needs to steer to the right to avoid that. But this raises even more questions. \textit{Should the car steer to the right long before the object? Is it enough to turn the wheels in the last moment? Are we sure we are able to steer away from collision, isn't an emergency brake a better solution?} I answered these questions and solved the problem of finding the best actuation with the introduction of fitness factors.
 
 \subsection{Fitness factors}
 A fitness factor is a number in the [0.0 1.0] interval describing how good (how fit) the given actuation is according to an expectation or requirement. I introduced three fitness factors in the algorithm.
 
+\begin{minipage}{\textwidth}
 \textbf{Speed factor}
 
 Describes how near the actuation's speed is to the target speed.
@@ -460,7 +470,9 @@ Describes how near the actuation's speed is to the target speed.
 0.5: The actuation's speed is halfway between the target speed and the worst possible candidate.
 
 0.0: The actuation's speed is the maximum permitted speed to the opposite direction (worst possible candidate).
+\end{minipage}
 
+\begin{minipage}{\textwidth}
 \textbf{Direction factor}
 
 Describes how near the actuation's wheel angle is to the target wheel angle.
@@ -470,7 +482,9 @@ Describes how near the actuation's wheel angle is to the target wheel angle.
 0.5: The actuation's wheel angle is halfway between the target wheel angle and the worst possible candidate.
 
 0.0: The actuation's wheel angle is the maximum permitted wheel angle to the opposite direction (worst possible candidate).
+\end{minipage}
 
+\begin{minipage}{\textwidth}
 \textbf{Safety factor}
 
 Describes how safe the actuation is, meaning how improbable a collision is.
@@ -479,7 +493,8 @@ Describes how safe the actuation is, meaning how improbable a collision is.
 
 0.5: The actuation leads to a collision, but the obstacle is farther than the car's brake distance.
 
-0.0: The actuation leads to an unavoidable\footnote{An unavoidable collision means that the obstacle is too near to stop before it using the motion planner's maximum deceleration. Note, that emergency braking may still stop the car in time, as it means a more intensive decelartion.} collision.
+0.0: The actuation leads to an unavoidable collision.
+\end{minipage}
 
 Let me explain these factors with two simple examples, regarding the same scenario (shown above in figure figure \ref{what_is_the_best_actuation}).
 The following images show two possible actuations in a situation (both are within the dynamic window). And based on their speed and wheel angles, the car's current configuration and the obstacle's position, the fitness factors can be calculated for both actuations.
@@ -502,6 +517,7 @@ The following images show two possible actuations in a situation (both are withi
 
 Figure \ref{possible_actuations} shows the two example actuations. As a precondition, the target speed and wheel angle must be defined. The target speed is always defined by the maximum allowed speed (see MAX\_SPEED\_FWD and MAX\_SPEED\_BWD in \ref{chap:input_parameters}) and the target wheel angle. For this is only an example, let me assume that the car is in perfect orientation and arbitrarily set the target speed to MAX\_SPEED\_FWD, and the target wheel angle to zero. Let us assume that we have already calculated the collision times for each possible actuation.
 
+\begin{minipage}{\textwidth}
 During factor calculations, the following acronyms are used:
 
 \begin{center}
@@ -531,19 +547,25 @@ During factor calculations, the following acronyms are used:
         \hline
     \end{tabular}
 \end{center}
+\end{minipage}
 
+\begin{minipage}{\textwidth}
 \[ MAX\_SPEED\_FWD = 1.5 \frac{m}{s} \]
 \[ MAX\_WHEEL\_ANGLE = 20 deg \]
 \[ T_{check} = 3 s \]
 \[ v_{target} = MAX\_SPEED\_FWD \]
 \[ \alpha_{target} = 0 deg \]
+\end{minipage}
 
+\begin{minipage}{\textwidth}
 Factor's for actuation \textit{i} are calculated using the following equations:
 
 \[ F_{speed,i} = 1 - \frac{abs(v_{i} - v_{target})}{MAX\_SPEED\_FWD - MAX\_SPEED\_BWD} \]
 \[ F_{dir,i} = 1 - \frac{abs(\alpha_{i} - \alpha_{target})}{2 * MAX\_WHEEL\_ANGLE} \]
 \[ F_{safety,i} = \frac{t_{coll,i}}{T_{check}} \]
+\end{minipage}
 
+\begin{minipage}{\textwidth}
 The factor calculations for the two examples are the following:
 
 \textbf{Straight actuation} (figure \ref{straight_actuation})
@@ -551,20 +573,25 @@ The factor calculations for the two examples are the following:
 \[ v_{1} = 1.5 \frac{m}{s} \]
 \[ \alpha_{1} = 0 deg \]
 \[ t_{coll,1} = 1.5 s \]
+\end{minipage}
 
+\begin{minipage}{\textwidth}
 The fitness factors are the following (calculated by the equations listed above):
 
 \[ F_{speed,1} = 1.00 \]
 \[ F_{dir,1} = 1.00 \]
 \[ F_{safety,1} = 0.50 \]
+\end{minipage}
 
 As it is clearly visible on the picture, and also from the results, the speed and direction factors are perfect, but the safety factor is low, because the leads to a collision in the near future. Now let us examine the other actuation.
 
+\begin{minipage}{\textwidth}
 \textbf{Curved actuation} (figure \ref{curved_actuation})
 
 \[ v_{2} = 1.5 \frac{m}{s} \]
 \[ \alpha_{2} = -10 deg \]
 \[ t_{coll,2} = 4.5 s \]
+\end{minipage}
 
 Note that the collision time of the actuation is always is the [0 {T\textsubscript{check}] interval. The result of the collision time check method is T\textsubscript{check} when the actuation does not cause a collision. The fitness factors are the following (calculated by the equations listed above):
 
@@ -574,11 +601,13 @@ Note that the collision time of the actuation is always is the [0 {T\textsubscri
 
 Now that the speed, direction and safety factors have been calculated for all possible actuations, the only subtask left is to find the best actuation.
 
+\begin{minipage}{\textwidth}
 \subsection{Best actuation}
 
 The best possible actuation is always the one with the highest fitness factors. The factors of an actuation are summarized to one number (which will then become \textit{the} fitness of the actuation) the following way:
 
 \[ F_{i} = \frac{F_{speed,i} * w_{speed} + F_{dir,i} * w_{dir} + F_{safety,i} * w_{safety}}{w_{speed} + w_{dir} + w_{safety}} \]
+\end{minipage}
 
 \begin{center}
     \begin{tabular}{ | c | c | }
@@ -600,14 +629,17 @@ The best possible actuation is always the one with the highest fitness factors. 
     \end{tabular}
 \end{center}
 
+\begin{minipage}{\textwidth}
 In the implementation, the weights are set as follows. (Further tuning is possible and advised for more production-ready implementations.)
 
 \[ W\_SPEED\_FACTOR = 2.00 \]
 \[ W\_DIRECTION\_FACTOR = 1.00 \]
 \[ W\_SAFETY\_FACTOR = 4.00 \]
+\end{minipage}
 
 As an example, let us continue the previous example with the straight and the curved actuations.
 
+\begin{minipage}{\textwidth}
 \textbf{Straight actuation} (figure \ref{straight_actuation})
 
 \[ F_{speed,1} = 1.00 \]
@@ -617,7 +649,9 @@ As an example, let us continue the previous example with the straight and the cu
 An the final fitness is:
 
 \[ F_{1} = \frac{1.00 * 2.00 + 1.00 * 1.00 + 0.50 * 4.00}{2.00 + 1.00 + 4.00} = 0.71 \]
+\end{minipage}
 
+\begin{minipage}{\textwidth}
 \textbf{Curved actuation} (figure \ref{curved_actuation})
 
 \[ F_{speed,2} = 1.00 \]
@@ -627,10 +661,25 @@ An the final fitness is:
 An the final fitness is:
 
 \[ F_{2} = \frac{1.00 * 2.00 + 0.75 * 1.00 + 1.00 * 4.00}{2.00 + 1.00 + 4.00} = 0.96 \]
+\end{minipage}
 
 The results show that out these two actuations, the second one (the curve) would have been selected by the algorithm. This is mainly because safety has a much higher weight than direction when summarizing factors. Obviously, this has not been a complete actuation search because the example consisted of only two actuations, while the the dynamic window can consist of tens or even hundreds of possible alternatives. As I mentioned earlier, the width and the height of the dynamic window depends on the car's and the environments characteristics, while its resolution can be set in the parameters (see DYNAMIC\_WINDOW\_ANGLE\_RESOLUTION and DYNAMIC\_WINDOW\_SPEED\_RESOLUTION in \ref{chap:input_parameters}).
 
 \subsection{Publishing Ackermann driving control}
 The hard part of the node's work is done, the best possible actuation has been found. The very last task is to publish this desired speed and wheel angle pair to the other ROS nodes that control the car.
 
-This publication happens using Ackermann driving messages, which are standard mesages in ROS (\href{http://docs.ros.org/jade/api/ackermann_msgs/html/msg/AckermannDrive.html}{AckermannDrive} message type defined by the \href{https://wiki.ros.org/ackermann_msgs}{ackermann\_msgs} package). Among other fields (which are currently not used by the project) it has a \textit{speed} and a \textit{steering\_angle} field - given in m/s and radians.
+This publication happens on topic \textit{/vrcar/manual\_control}, using Ackermann driving messages, which are standard mesages in ROS (\href{http://docs.ros.org/jade/api/ackermann_msgs/html/msg/AckermannDrive.html}{ackermann\_msgs/AckermannDrive} message type defined by the \href{https://wiki.ros.org/ackermann_msgs}{ackermann\_msgs} package).
+
+The ackermann\_msgs/AckermannDrive message format is the following:
+
+\begin{minipage}{\textwidth}
+\begin{lstlisting}[language=IDL]
+float32 steering_angle
+float32 steering_angle_velocity
+float32 speed
+float32 acceleration
+float32 jerk
+\end{lstlisting}
+\end{minipage}
+
+Among other fields (which are currently not used by the project) it has a \textit{speed} and a \textit{steering\_angle} field - given in m/s and radians. The actuator nodes will use these two fileds to propagate the requested values to the DC motor and the steering servo, and thus, the control pipe has reached its end.
