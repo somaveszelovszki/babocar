@@ -43,18 +43,18 @@ Given this velocity obstacle map, the algorithm has a basic knowledge of the rea
             every node/.style={fill=white, font=\sffamily}, align=center]
         % Input nodes
         \node (static_map)      [inout_node]                                            {Static map};
-        \node (trajectory)      [inout_node, xshift=3.5cm]                              {Input trajectory};
-        \node (control)         [inout_node, xshift=7.0cm]                              {Control};
-        \node (dynamic_objects) [inout_node, xshift=10.5cm]                             {Dynamic objects};
+        \node (trajectory)      [inout_node, xshift=5.0cm]                              {Input trajectory};
+        \node (control)         [inout_node, xshift=2.5cm, yshift=-3.0cm]               {Control};
+        \node (dynamic_objects) [inout_node, xshift=10.0cm]                             {Dynamic objects};
         % Update nodes
-        \node (find_dest)       [update_node, below of=trajectory, xshift=1.75cm]       {Find destination};
-        \node (calc_target_act) [update_node, below of=find_dest]                       {Calculate target actuation};
+        \node (find_dest)       [update_node, below of=trajectory]                      {Find destination};
+        \node (calc_target_act) [update_node, below of=find_dest, yshift=-1.5cm]        {Calculate target actuation};
         \node (update_window)   [update_node, below of=calc_target_act]                 {Update dynamic window};
 		% Static nodes
-        \node (static_filter)   [static_node, below of=static_map, yshift=-3cm]         {Filter};
+        \node (static_filter)   [static_node, below of=static_map, yshift=-4.5cm]       {Filter};
         \node (static_calc_col) [static_node, below of=static_filter]                   {Calculate collision times};
 		% Dynamic nodes
-        \node (dynamic_filter)  [dynamic_node, below of=dynamic_objects, yshift=-1.5cm] {Filter};
+        \node (dynamic_filter)  [dynamic_node, below of=dynamic_objects, yshift=-3.0cm] {Filter};
         \node (dynamic_traj)    [dynamic_node, below of=dynamic_filter]                 {Calculate trajectories};
         \node (dyn_calc_col)    [dynamic_node, below of=dynamic_traj]                   {Calculate collision times};
         % Velocity obstacle nodes
@@ -66,7 +66,7 @@ Given this velocity obstacle map, the algorithm has a basic knowledge of the rea
         \draw[->]   (static_filter) -- (static_calc_col);
         % Update connections
         \draw[->]      (trajectory) -- (find_dest);
-        \draw[->]         (control) -- (find_dest);
+        \draw[->]         (control) -- (calc_target_act);
         \draw[->]       (find_dest) -- (calc_target_act);
         \draw[->] (calc_target_act) -- (update_window);
         \draw[->]   (update_window) -- (static_calc_col);
@@ -216,6 +216,23 @@ After the destination point has been selected, the next step is to calculate the
     \caption{Calculating the target steering angle}
     \label{calc_steering_angle}
 \end{figure}
+
+\subsection{External target actuation}
+For easier testing, the node also supports external target actuations, meaning that the target actuation is not calculated from a trajectory, but is directly provided by another node. The external actuation can be set on topic \textit{/vrcar/filtered\_control\_orig}, which is a topic of \href{http://docs.ros.org/jade/api/ackermann_msgs/html/msg/AckermannDrive.html}{\textit{ackermann\_msgs/AckermannDrive}} messages, that have the following layout:
+
+\begin{minipage}{\textwidth}
+\begin{lstlisting}[language=IDL]
+float32 steering_angle
+float32 steering_angle_velocity
+float32 speed
+float32 acceleration
+float32 jerk
+\end{lstlisting}
+\end{minipage}
+
+Among other fields (which are currently not used by the project) it has a \textit{speed} and a \textit{steering\_angle} field - given in m/s and radians. These two fields are used as the target speed and wheel angle.
+
+The program chooses between the target actuation modes dynamically, and the external target actuation has greater priority. So when messages are arriving on the external target actuation topic, they are the ones the algorithm uses, but when these messages cease to arrive, the node automatically switches to trajectory follow mode and calculates the next target actuation according to the given path.
 
 \subsection{Updating the dynamic window}
 In every iteration, the dynamic window must also be updated, which is independent from the target actuation, but depends on the current actuation, which is obtained by reading the odometry message published another node in the car. I have already described the structure of the \href{http://docs.ros.org/melodic/api/nav_msgs/html/msg/Odometry.html}{\textit{\textit{nav\_msgs/Odometry}}} message earlier in \ref{chap:absolute_points}.
@@ -668,18 +685,6 @@ The results show that out these two actuations, the second one (the curve) would
 \subsection{Publishing Ackermann driving control}
 The hard part of the node's work is done, the best possible actuation has been found. The very last task is to publish this desired speed and wheel angle pair to the other ROS nodes that control the car.
 
-This publication happens on topic \textit{/vrcar/manual\_control}, using Ackermann driving messages, which are standard mesages in ROS (\href{http://docs.ros.org/jade/api/ackermann_msgs/html/msg/AckermannDrive.html}{ackermann\_msgs/AckermannDrive} message type defined by the \href{https://wiki.ros.org/ackermann_msgs}{ackermann\_msgs} package).
+This publication happens on topic \textit{/vrcar/manual\_control}, using \href{http://docs.ros.org/jade/api/ackermann_msgs/html/msg/AckermannDrive.html}{ackermann\_msgs/AckermannDrive} messages.
 
-The ackermann\_msgs/AckermannDrive message format is the following:
-
-\begin{minipage}{\textwidth}
-\begin{lstlisting}[language=IDL]
-float32 steering_angle
-float32 steering_angle_velocity
-float32 speed
-float32 acceleration
-float32 jerk
-\end{lstlisting}
-\end{minipage}
-
-Among other fields (which are currently not used by the project) it has a \textit{speed} and a \textit{steering\_angle} field - given in m/s and radians. The actuator nodes will use these two fileds to propagate the requested values to the DC motor and the steering servo, and thus, the control pipe has reached its end.
+The actuator nodes will use these messages to propagate the requested values to the DC motor and the steering servo, and thus, the control pipe has reached its end.
