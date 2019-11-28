@@ -14,7 +14,7 @@ As a first subtask of the mapping project, I checked if any implementation is av
 In order to create two disjunct maps, one static and one dynamic, the key element of the process is the separation of the moving and non-moving obstacles of the measured points. After determining these two disjunct set of points, the maps can be converted to any desired or required format. Static maps are usually published as occupancy grids, while dynamic obstacles need to present information about their speed vector. Occupancy grids do not group the grid points according to their probabilities, therefore they do not know about the obstacles' borders and areas\footnote{In this project, 2D LIDARs were used, therefore the measured objects were seen as 2D shapes that have areas, not 3D objects that have volumes}. Dynamic obstacles however can be either represented as separate points with their own speed vectors, or groups of points, each groups having one speed vector. I chose the latter representation, thus publishing groups that contain a set of points (all the points, ideally) of the same obstacle. This way there is a one-to-one relationship between moving obstacles and groups. The separation and grouping methods of the mapping process is shown on diagram \ref{mapping_method}.
 
 \tikzset{
-     base_node/.style = {rectangle, rounded corners, draw=black,
+  base_node/.style    = {rectangle, rounded corners, draw=black,
                          minimum width=4.5cm, minimum height=1cm,
                          text centered, font=\sffamily},
   inout_node/.style   = {base_node, fill=blue!30},
@@ -76,21 +76,12 @@ The diagram consists of 3 subgraphs - these are also marked on the diagram. The 
 \label{chap:input_parameters}
 The following input parameters can manipulate the mapping node:
 
-\textbf{LIDAR\_MAX\_DIST} [meter]
-
-The maximum measurable distance by the LIDAR(s). Depends on the LIDAR's characteristics.
-
-\textbf{MAP\_RES} [meter]
-
-The resolution of the built static map. Increasing this this value helps building a better quality map, but also increases the node's resource need.
-
-\textbf{MAP\_SIZE} [meter]
-
-The size of the built static map. Increasing this this value helps building a better quality map, but also increases the node's resource need.
-
-\textbf{SINGLE\_LIDAR} [boolean]
-
-Defines if the node's input is one LIDAR scan, or a separate front and rear scan that needs to be handled separately.
+\begin{itemize}
+\item\textbf{LIDAR\_MAX\_DIST} [meter] The maximum measurable distance by the LIDAR(s). Depends on the LIDAR's characteristics.
+\item\textbf{MAP\_RES} [meter] The resolution of the built static map. Increasing this this value helps building a better quality map, but also increases the node's resource need.
+\item\textbf{MAP\_SIZE} [meter] The size of the built static map. Increasing this this value helps building a better quality map, but also increases the node's resource need.
+\item \textbf{SINGLE\_LIDAR} [boolean] Defines if the node's input is one LIDAR scan, or a separate front and rear scan that needs to be handled separately.
+\end{itemize}
 \end{minipage}
 
 \section{Separation and grouping}

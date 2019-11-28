@@ -23,9 +23,9 @@ The planner algorithm I implemented uses velocity obstacles to determine which c
 Given this velocity obstacle map, the algorithm has a basic knowledge of the reachable velocities and their level of safety. These safety levels provide a good starting point for further calculations, trajectory and collision estimations. My algorithm converts the forbidden velocity map's collision times to safety factors, but also takes the destination point's position and the target speed into consideration when selecting the next actuator outputs. The next graph shows all the sub-tasks of the local trajectory planner algorithm.
 
 \tikzset{
-     base_node/.style = {rectangle, rounded corners, draw=black,
-                         minimum width=4.5cm, minimum height=1cm,
-                         text centered, font=\sffamily},
+  base_node/.style     = {rectangle, rounded corners, draw=black,
+                          minimum width=4.5cm, minimum height=1cm,
+                          text centered, font=\sffamily},
   inout_node/.style    = {base_node, fill=blue!30, minimum width=3.0cm},
   update_node/.style   = {base_node, fill=orange!15},
   dynamic_node/.style  = {base_node, fill=red!30},
@@ -92,73 +92,25 @@ The diagram consists of 4 subgraphs - these are also marked on the diagram with 
 \label{chap:input_parameters}
 The following input parameters can manipulate the motion planning node:
 
-\textbf{CAR\_FRONT\_REAR\_WHEEL\_AXIS\_DIST} [meter]
-
-The distance between the front and rear wheels axles of the car.
-
-\textbf{CAR\_LENGTH} [meter]
-
-The length of the car.
-
-\textbf{CAR\_WIDTH} [meter]
-
-The width of the car.
-
-\textbf{COLLISION\_CHECK\_TIME\_STEP} [millisecond]
-
-The resolution of the iterative collision check.
-
-\textbf{DYNAMIC\_WINDOW\_ANGLE\_RESOLUTION} [radian]
-
-The wheel angle resolution of the dynamic window.
-
-\textbf{DYNAMIC\_WINDOW\_SPEED\_RESOLUTION} [meter/sec]
-
-The speed resolution of the dynamic window.
-
-\textbf{MAX\_ACCELERATION} [meter/sec2]
-
-The maximum permitted acceleration.
-
-\textbf{MAX\_DYNAMIC\_OBSTACLE\_DISTANCE} [meter]
-
-The radius of the dynamic obstacle filter.
-
-\textbf{MAX\_SPEED\_BWD} [meter/sec]
-
-The maximum permitted backward speed.
-
-\textbf{MAX\_SPEED\_FWD} [meter/sec]
-
-The maximum permitted forward speed.
-
-\textbf{MAX\_STATIC\_OBSTACLE\_DISTANCE} [meter]
-
-The radius of the static obstacle filter.
-
-\textbf{MAX\_WHEEL\_ANGLE} [radian]
-
-The maximum permitted wheel angle. 
-
-\textbf{MAX\_WHEEL\_ANGULAR\_VELOCITY} [radian/sec2]
-
-The maximum permitted angular velocity of the steered wheels.
-
-\textbf{MIN\_KEPT\_DISTANCE} [meter]
-
-The minimum distance to keep from objects
-
-\textbf{W\_DIRECTION\_FACTOR} [dimensionless]
-
-The weight of the direction factor when finding the best possible actuation.
-
-\textbf{W\_SAFETY\_FACTOR} [dimensionless]
-
-The weight of the safety factor when finding the best possible actuation.
-
-\textbf{W\_SPEED\_FACTOR} [dimensionless]
-
-The weight of the speed factor when finding the best possible actuation.
+\begin{itemize}
+\item\textbf{CAR\_FRONT\_REAR\_WHEEL\_AXIS\_DIST} [meter] The distance between the front and rear wheels axles of the car.
+\item\textbf{CAR\_LENGTH} [meter] The length of the car.
+\item\textbf{CAR\_WIDTH} [meter] The width of the car.
+\item\textbf{COLLISION\_CHECK\_TIME\_STEP} [millisecond] The resolution of the iterative collision check.
+\item\textbf{DYNAMIC\_WINDOW\_ANGLE\_RESOLUTION} [radian] The wheel angle resolution of the dynamic window.
+\item\textbf{DYNAMIC\_WINDOW\_SPEED\_RESOLUTION} [meter/sec] The speed resolution of the dynamic window.
+\item\textbf{MAX\_ACCELERATION} [meter/sec2] The maximum permitted acceleration.
+\item\textbf{MAX\_DYNAMIC\_OBSTACLE\_DISTANCE} [meter] The radius of the dynamic obstacle filter.
+\item\textbf{MAX\_SPEED\_BWD} [meter/sec] The maximum permitted backward speed.
+\item\textbf{MAX\_SPEED\_FWD} [meter/sec] The maximum permitted forward speed.
+\item\textbf{MAX\_STATIC\_OBSTACLE\_DISTANCE} [meter] The radius of the static obstacle filter.
+\item\textbf{MAX\_WHEEL\_ANGLE} [radian] The maximum permitted wheel angle. 
+\item\textbf{MAX\_WHEEL\_ANGULAR\_VELOCITY} [radian/sec2] The maximum permitted angular velocity of the steered wheels.
+\item\textbf{MIN\_KEPT\_DISTANCE} [meter] The minimum distance to keep from objects
+\item\textbf{W\_DIRECTION\_FACTOR} [dimensionless] The weight of the direction factor when finding the best possible actuation.
+\item\textbf{W\_SAFETY\_FACTOR} [dimensionless] The weight of the safety factor when finding the best possible actuation.
+\item\textbf{W\_SPEED\_FACTOR} [dimensionless] The weight of the speed factor when finding the best possible actuation.
+\end{itemize}
 \end{minipage}
 
 \section{Target actuation and dynamic window}
