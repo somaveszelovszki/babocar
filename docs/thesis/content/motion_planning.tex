@@ -18,7 +18,7 @@ Out of these methods, velocity-based algorithms are by far the most popular, due
 
 \section{Method}
 
-The planner algorithm I implemented uses velocity obstacles to determine which configurations of the car are safe. Velocity obstacle methods (descibed in \cite{VelocityForbiddenMap} and in \citep{VelocityObstacles}) are based on the following statement: \textit{Assuming a given a given vehicle configuration (position, orientation, speed and wheel angle), the time until collision with a given static or dynamic object in the map can be calculated.} Therefore, velocity obstacle-based methods calculate this collision time for all surrounding objects and for all vehicle velocities. thus creating a velocity obstacle map, or forbidden velocity map (also referred to as dynamic velocity space in \cite{DynamicMotionPlanningSurvey}). Using the dynamic window approach is advised in this step,as it filters out non-reachable velocities before collision-time calculations, thus decreasing the execution time of the algorithm.
+The planner algorithm I implemented uses velocity obstacles to determine which configurations of the car are safe. Velocity obstacle methods (described in \cite{VelocityForbiddenMap} and in \citep{VelocityObstacles}) are based on the following statement: \textit{Assuming a given a given vehicle configuration (position, orientation, speed and wheel angle), the time until collision with a given static or dynamic object in the map can be calculated.} Therefore, velocity obstacle-based methods calculate this collision time for all surrounding objects and for all vehicle velocities. thus creating a velocity obstacle map, or forbidden velocity map (also referred to as dynamic velocity space in \cite{DynamicMotionPlanningSurvey}). Using the dynamic window approach is advised in this step,as it filters out non-reachable velocities before collision-time calculations, thus decreasing the execution time of the algorithm.
 
 Given this velocity obstacle map, the algorithm has a basic knowledge of the reachable velocities and their level of safety. These safety levels provide a good starting point for further calculations, trajectory and collision estimations. My algorithm converts the forbidden velocity map's collision times to safety factors, but also takes the destination point's position and the target speed into consideration when selecting the next actuator outputs. The next graph shows all the sub-tasks of the local trajectory planner algorithm.
 
@@ -85,7 +85,7 @@ Given this velocity obstacle map, the algorithm has a basic knowledge of the rea
     \label{motion_planning_method}
 \end{figure}
 
-The diagram consists of 4 subgraphs - these are also marked on the diagram with different colors. The orange subgraph describes the environment-independent sub-tasks of the algorithm - finding the next destination point, updating the target actuation and the dynamic window. The yellow one is about the method of reducing the size of the static map by filtering out those points that are not needed for the trajectory planning. The red side subgraph shows that for dynamic objects, trajectory calculation is also necessary besides filtering. And the last one (populating the bottom area of the graph, marked with green colour) contains the main planning logic. The sections under \ref{chap:motion_planning} explain these subgraphs in detail.
+The diagram consists of 4 sub-graphs - these are also marked on the diagram with different colors. The orange sub-graph describes the environment-independent sub-tasks of the algorithm - finding the next destination point, updating the target actuation and the dynamic window. The yellow one is about the method of reducing the size of the static map by filtering out those points that are not needed for the trajectory planning. The red side sub-graph shows that for dynamic objects, trajectory calculation is also necessary besides filtering. And the last one (populating the bottom area of the graph, marked with green colour) contains the main planning logic. The sections under \ref{chap:motion_planning} explain these sub-graphs in detail.
 
 \begin{minipage}{\textwidth}
 \section{Input parameters}
@@ -115,9 +115,9 @@ The following input parameters can manipulate the motion planning node:
 
 \section{Target actuation and dynamic window}
 \label{chap:target_actuation_and_dynamic_window}
-In every loop (at each new incoming map data), the target actuation and the dynamic window are updated. The target actuation describes the desired speed and steering wheel angle for the next step, therefore the desired linear and angular speed vectors. The dynamic window is independent from the target actuation, but depends on the current actuation. It contains a set of speeds and wheel angles that are reachable by the car within the next step. The width and height of the window (the maximum speed and wheel angle change in one step) are defined by the mechanical characteristics of the car. So basically, the aim of this subtask is to provide the algorithm a target actuation, and a set of reachable actuations.
+In every loop (at each new incoming map data), the target actuation and the dynamic window are updated. The target actuation describes the desired speed and steering wheel angle for the next step, therefore the desired linear and angular speed vectors. The dynamic window is independent from the target actuation, but depends on the current actuation. It contains a set of speeds and wheel angles that are reachable by the car within the next step. The width and height of the window (the maximum speed and wheel angle change in one step) are defined by the mechanical characteristics of the car. So basically, the aim of this sub-task is to provide the algorithm a target actuation, and a set of reachable actuations.
 
-When I implemented the target actuation update mechanism, that leads the car according to the input trajectory, I had several options to choose from. The first option was to split the trajectory into line-segments, and implement and tune a steering angle controller (e.g. a PD controller) to follow this line. I dropped this idea to prevent the re-tuning that would have been needed for each target vehicles (simulation, real-life test vehicles). Another option was the 'invisible string' the 'dog bone' method, where a target destination point is always in front of the car, and the car is always trying to reach this point, as if the point was pulling it by a string. The target actuation's wheel angle defines a trajectory curve, that goes through the destination point. If the destination point is always on the trajectory, and in front of car (within the right distance range), the car is goint to follow the trajectory. I chose the latter (the 'invisible string') method.
+When I implemented the target actuation update mechanism, that leads the car according to the input trajectory, I had several options to choose from. The first option was to split the trajectory into line-segments, and implement and tune a steering angle controller (e.g. a PD controller) to follow this line. I dropped this idea to prevent the re-tuning that would have been needed for each target vehicles (simulation, real-life test vehicles). Another option was the 'invisible string' the 'dog bone' method, where a target destination point is always in front of the car, and the car is always trying to reach this point, as if the point was pulling it by a string. The target actuation's wheel angle defines a trajectory curve, that goes through the destination point. If the destination point is always on the trajectory, and in front of car (within the right distance range), the car is going to follow the trajectory. I chose the latter (the 'invisible string') method.
 
 \subsection{Finding the next destination point}
 This method requires a destination point in each iteration. This point is preferably on the trajectory, in front of the car, 'pulling' the car to the right direction. The destination point search start with finding the point in the trajectory nearest to the car's current position. The destination point needs to be in front of the car, but its distance from the car (which is nearly equal to its distance from the previously found nearest point) is not trivial (see figure \ref{dest_point_update}).
@@ -138,7 +138,7 @@ Choosing a too near destination will result in the car starting to oscillate aro
     \label{traj_oscillation}
 \end{figure}
 
-However, the destination point must not be chosen too far, either, because it straightens the curves of the trajectory, rounds its sharp peaks, and adds an offset to the long circular sections. Figure \ref{traj_rounding} demonstrates these effects. The effect shown on the left side might even be advantageous, but the righ-hand side effect is certainly not.
+However, the destination point must not be chosen too far, either, because it straightens the curves of the trajectory, rounds its sharp peaks, and adds an offset to the long circular sections. Figure \ref{traj_rounding} demonstrates these effects. The effect shown on the left side might even be advantageous, but the right-hand side effect is certainly not.
 
 \begin{figure}[!ht]
     \centering
@@ -157,7 +157,7 @@ However, the destination point must not be chosen too far, either, because it st
 \end{figure}
 
 After empirical testing, the optimal distance of the destination point and the nearest trajectory point (marked with yellow and black dots in figure \ref{dest_point_update}) proved to be around 4 times the distance between the car's front and rear axles (see CAR\_FRONT\_REAR\_WHEEL\_AXIS\_DIST in \ref{chap:input_parameters}). Note, that this value largely depends on the dynamic window's maximum angular velocity limit and the car's mechanical characteristics (e.g. using a faster steering servo or a 4-wheel steering car would reduce the optimal distance).
-In order to follow the straight segments of the target path before curves, I implemented the length of the invisible string (the distance in front of the nearest trajectory point) to change dynamically, according to the car's current distance from the trajectory. This tweak supressed the rounding effect mentioned above, but not entirely. This is now considered a limitation of the algorithm's efficiency.
+In order to follow the straight segments of the target path before curves, I implemented the length of the invisible string (the distance in front of the nearest trajectory point) to change dynamically, according to the car's current distance from the trajectory. This tweak suppressed the rounding effect mentioned above, but not entirely. This is now considered a limitation of the algorithm's efficiency.
 
 \subsection{Calculating the target actuation}
 After the destination point has been selected, the next step is to calculate the target actuation - the speed and steering angle pair that would lead the car to the destination point. First, the target wheel angle is calculated using linear algebra (see figure \ref{calc_steering_angle}). The target speed calculation is based on two factors. The first is the target speed limit, which we expect the car to keep, given no extraordinary circumstances. This should be set to a safe speed that the car can keep up during its travel (see MAX\_SPEED\_FWD and MAX\_SPEED\_BWD in \ref{chap:input_parameters}). The actual target speed will never exceed this limit. But the target steering angle may require this target speed to be lower, because the car can manage to reach higher speeds safely when going straight, than when in a sharp bend.
@@ -198,7 +198,7 @@ The 'width' and 'height' of the window (which is defined by the maximum speed an
     \label{dynamic_window}
 \end{figure}
 
-However, the size of the dynamic window may reduce when its size is limited by the hard limits of speed and wheel angle. A perfect example for this situation is when the steering angle is at its maximum at either left or right direction (see MAX\_WHEEL\_ANGLE in \ref{chap:input_parameters}), in which case changing the angle further to this direction is impossible. This results in the dynamic window getting halved - as only its original right or left side is reachable, depending on the current steering direcion. It is trivial that in these cases such as the previous example, the current actuation is no longer in the center of the dynamic winow.
+However, the size of the dynamic window may reduce when its size is limited by the hard limits of speed and wheel angle. A perfect example for this situation is when the steering angle is at its maximum at either left or right direction (see MAX\_WHEEL\_ANGLE in \ref{chap:input_parameters}), in which case changing the angle further to this direction is impossible. This results in the dynamic window getting halved - as only its original right or left side is reachable, depending on the current steering direction. It is trivial that in these cases such as the previous example, the current actuation is no longer in the center of the dynamic window.
 Another important characteristics of the dynamic window is its resolution - both speed and angular velocity, which are settable parameters (see DYNAMIC\_WINDOW\_SPEED\_RESOLUTION and DYNAMIC\_WINDOW\_ANGLE\_RESOLUTION in \ref{chap:input_parameters}). Increasing the resolution leads to smoother control, but also increases the node's resource need and runtime.
 
 The managing the dynamic window internally, the motion planning node also publishes the dynamic window's possible actuations in a \href{http://docs.ros.org/melodic/api/visualization_msgs/html/msg/MarkerArray.html}{\textit{visualization\_msgs::MarkerArray}} on topic \textit{available\_velocities}, so that they can be viewed on-the-fly in rviz.
@@ -215,7 +215,7 @@ The managing the dynamic window internally, the motion planning node also publis
 Static points in the map are received from the mapping node in \href{http://docs.ros.org/melodic/api/nav_msgs/html/msg/OccupancyGrid.html}{\textit{nav\_msgs/OccupancyGrid}} messages on topic \textit{static\_grid} (see (see \ref{chap:publishing_static_points})), and they populate a very large percent of the car's surroundings, so handling them efficiently can boost up the algorithms runtime performance. Therefore, they are not joined with the dynamic points, but filtered separately, and the collision times are calculated in a way that is optimized for non-moving objects to gain performance.
 
 \subsection{Filtering static points}
-Separating the static points from the dynamic objects has both advantages and disadvantages for local motion planning. The most important advantage is that the collision check with static points is much simpler and faster than with dynamic obstacles. A great disadvantage, however, is that the static map contains lots of points, and running a collision check on all of them would cause the algorithm to be unacceptably slow. To prevent this undesired behaviour, a preparatory filter is applied to the map, removing those points from the map, that are too far from the car's current position to be worth keeping. Depending on the environment's characteristics, this step may reduce the runtime of the static collision times drastically - even to zero, if all the static points are far from the car (e.g. in a large room).
+Separating the static points from the dynamic objects has both advantages and disadvantages for local motion planning. The most important advantage is that the collision check with static points is much simpler and faster than with dynamic obstacles. A great disadvantage, however, is that the static map contains lots of points, and running a collision check on all of them would cause the algorithm to be unacceptably slow. To prevent this undesired behaviour, a preparatory filter is applied to the map, removing those points from the map, that are too far from the car's current position to be worth keeping. Depending on the environment's characteristics, this step may reduce the run-time of the static collision times drastically - even to zero, if all the static points are far from the car (e.g. in a large room).
 
 \begin{figure}[!ht]
     \centering
@@ -292,9 +292,9 @@ The angular difference between the car and the obstacle (denoted $\gamma$) can b
 
 After the angle is obtained, the collision distance and time can be easily calculated using the following equations:
 
-\[ s_{coll} = R * \gamma \]
+\[ s_{coll} = R \cdot \gamma \]
 
-\[ t_{coll} = s_{coll} * v_{car} \]
+\[ t_{coll} = s_{coll} \cdot v_{car} \]
 
 \begin{center}
     \begin{tabular}{ | c | c | }
@@ -322,7 +322,7 @@ Handling dynamic obstacles is more difficult than handling static points, the al
 \subsection{Filtering dynamic objects}
 This first step when evaluating dynamic objects in the map is similar to static case - removing the too far obstacles. Trajectory modelling and collision check may be  resource and time heavy, so handling as few dynamic objects as possible is crucial. The size of the area worth keeping depends on the actual application and the dynamic characteristics of the car and the other moving objects. But as a general rule of thumb:
 
-\[ R = 2 * \frac{v_{max}^2}{a_{max}} \]
+\[ R = 2 \cdot \frac{v_{max}^2}{a_{max}} \]
 
 \begin{center}
     \begin{tabular}{ | c | c | }
@@ -340,9 +340,9 @@ is a good guess (note that the radius is twice as large as in the static case). 
 
 \subsection{Trajectory calculation}
 \label{trajectory_calculation}
-Now that the irrelevant dynamic objects have been filtered out, the next step is to calculate the kept obstacles' trajectories. Trajectory calculation is done using an iterative method - foreach obstacle, with a given time step (see COLLISION\_CHECK\_TIME\_STEP in \ref{chap:input_parameters}) the algorithm start iterating, updates the obstacles's position and orientation in each step and saves into an array of configurations - this array will become the trajectory itself. \textit{But how many steps should be saved?} may be an interesting question, to which the answer is also: it depends. It depends on how the application logic uses these trajectories. For my application, the needed number of steps is:
+Now that the irrelevant dynamic objects have been filtered out, the next step is to calculate the kept obstacles' trajectories. Trajectory calculation is done using an iterative method - for each obstacle, with a given time step (see COLLISION\_CHECK\_TIME\_STEP in \ref{chap:input_parameters}) the algorithm start iterating, updates the obstacle's position and orientation in each step and saves into an array of configurations - this array will become the trajectory itself. \textit{But how many steps should be saved?} may be an interesting question, to which the answer is also: it depends. It depends on how the application logic uses these trajectories. For my application, the needed number of steps is:
 
-\[ N = \frac{3 * \frac{v_{max}}{a_{max}}}{T_{step}} \]
+\[ N = \frac{3 \cdot \frac{v_{max}}{a_{max}}}{T_{step}} \]
 
 \begin{center}
     \begin{tabular}{ | c | c | }
@@ -361,9 +361,9 @@ Now that the irrelevant dynamic objects have been filtered out, the next step is
 After the trajectories for all moving obstacles have calculates, the algorithm can move forward, and check for collisions with these objects.
 
 \subsection{Dynamic collision times}
-Calculating the collision times with the dynamic obstacles is not based on linear algebra, like in the static case, but is executed in an iterative way. For all possible actuations (actuations that are present in the dynamic window), a trajectory is calculated - the same way that it has already been calculated for the other dynamic objects in the map. Using this trajectory and the pre-calculated other trajectories the algorithm iterates through time, updates the objects' configurations in each step according to their trajectories, and checks collisions. The iteration's time step is the configurable value that has been used before (see COLLISION\_CHECK\_TIME\_STEP in \ref{chap:input_parameters}). The simluation time (until the iterations go) is:
+Calculating the collision times with the dynamic obstacles is not based on linear algebra, like in the static case, but is executed in an iterative way. For all possible actuations (actuations that are present in the dynamic window), a trajectory is calculated - the same way that it has already been calculated for the other dynamic objects in the map. Using this trajectory and the pre-calculated other trajectories the algorithm iterates through time, updates the objects' configurations in each step according to their trajectories, and checks collisions. The iteration's time step is the configurable value that has been used before (see COLLISION\_CHECK\_TIME\_STEP in \ref{chap:input_parameters}). The simulation time (until the iterations go) is:
 
-\[ N = \frac{3 * \frac{v}{a_{max}}}{T_{step}} \]
+\[ N = \frac{3 \cdot \frac{v}{a_{max}}}{T_{step}} \]
 
 \begin{center}
     \begin{tabular}{ | c | c | }
@@ -393,7 +393,7 @@ Given that:
 
 the following statement is always true:
 
-\[ N <= \frac{3 * \frac{v_{max}}{a_{max}}}{T_{step}} \]
+\[ N <= \frac{3 \cdot \frac{v_{max}}{a_{max}}}{T_{step}} \]
 
 which was the number trajectory simulation time steps for the surrounding obstacles (see \ref{trajectory_calculation}). Therefore, it is provided that all objects in the environment have a pre-calculated trajectory for the whole collision check simulation interval.
 
@@ -424,7 +424,7 @@ Let's look at the scenario represented in figure \ref{what_is_the_best_actuation
     \label{what_is_the_best_actuation}
 \end{figure}
 
-The target trajectory is a straight line (marked with the green line in the rviz visualization, published by the motion planning node on topic \textit{global\_trajectory}). But there is an ostacle in the way. Without the obstacle being in the picture, one could state without hesitation, the the target actuation is always the one the keeps the car on the line. But once the object is there, this is no longer the case. Defining the best actuation to be the one that keeps car in direction would lead to collision, obviously, the car needs to steer to the right to avoid that. But this raises even more questions. \textit{Should the car steer to the right long before the object? Is it enough to turn the wheels in the last moment? Are we sure we are able to steer away from collision, isn't an emergency brake a better solution?} I answered these questions and solved the problem of finding the best actuation with the introduction of fitness factors.
+The target trajectory is a straight line (marked with the green line in the rviz visualization, published by the motion planning node on topic \textit{global\_trajectory}). But there is an obstacle in the way. Without the obstacle being in the picture, one could state without hesitation, the the target actuation is always the one the keeps the car on the line. But once the object is there, this is no longer the case. Defining the best actuation to be the one that keeps car in direction would lead to collision, obviously, the car needs to steer to the right to avoid that. But this raises even more questions. \textit{Should the car steer to the right long before the object? Is it enough to turn the wheels in the last moment? Are we sure we are able to steer away from collision, isn't an emergency brake a better solution?} I answered these questions and solved the problem of finding the best actuation with the introduction of fitness factors.
 
 \subsection{Fitness factors}
 A fitness factor is a number in the [0.0 1.0] interval describing how good (how fit) the given actuation is according to an expectation or requirement. I introduced three fitness factors in the algorithm.
@@ -530,7 +530,7 @@ During factor calculations, the following acronyms are used:
 Factor's for actuation \textit{i} are calculated using the following equations:
 
 \[ F_{speed,i} = 1 - \frac{abs(v_{i} - v_{target})}{MAX\_SPEED\_FWD - MAX\_SPEED\_BWD} \]
-\[ F_{dir,i} = 1 - \frac{abs(\alpha_{i} - \alpha_{target})}{2 * MAX\_WHEEL\_ANGLE} \]
+\[ F_{dir,i} = 1 - \frac{abs(\alpha_{i} - \alpha_{target})}{2 \cdot MAX\_WHEEL\_ANGLE} \]
 \[ F_{safety,i} = \frac{t_{coll,i}}{T_{check}} \]
 \end{minipage}
 
@@ -568,14 +568,14 @@ Note that the collision time of the actuation is always is the [0 {T\textsubscri
 \[ F_{dir,2} = 0.75 \]
 \[ F_{safety,2} = 1.00 \]
 
-Now that the speed, direction and safety factors have been calculated for all possible actuations, the only subtask left is to find the best actuation.
+Now that the speed, direction and safety factors have been calculated for all possible actuations, the only sub-task left is to find the best actuation.
 
 \begin{minipage}{\textwidth}
 \subsection{Best actuation}
 
 The best possible actuation is always the one with the highest fitness factors. The factors of an actuation are summarized to one number (which will then become \textit{the} fitness of the actuation) the following way:
 
-\[ F_{i} = \frac{F_{speed,i} * w_{speed} + F_{dir,i} * w_{dir} + F_{safety,i} * w_{safety}}{w_{speed} + w_{dir} + w_{safety}} \]
+\[ F_{i} = \frac{F_{speed,i} \cdot w_{speed} + F_{dir,i} \cdot w_{dir} + F_{safety,i} \cdot w_{safety}}{w_{speed} + w_{dir} + w_{safety}} \]
 \end{minipage}
 
 \begin{center}
@@ -617,7 +617,7 @@ As an example, let us continue the previous example with the straight and the cu
 
 An the final fitness is:
 
-\[ F_{1} = \frac{1.00 * 2.00 + 1.00 * 1.00 + 0.50 * 4.00}{2.00 + 1.00 + 4.00} = 0.71 \]
+\[ F_{1} = \frac{1.00 \cdot 2.00 + 1.00 \cdot 1.00 + 0.50 \cdot 4.00}{2.00 + 1.00 + 4.00} = 0.71 \]
 \end{minipage}
 
 \begin{minipage}{\textwidth}
@@ -629,7 +629,7 @@ An the final fitness is:
 
 An the final fitness is:
 
-\[ F_{2} = \frac{1.00 * 2.00 + 0.75 * 1.00 + 1.00 * 4.00}{2.00 + 1.00 + 4.00} = 0.96 \]
+\[ F_{2} = \frac{1.00 \cdot 2.00 + 0.75 \cdot 1.00 + 1.00 \cdot 4.00}{2.00 + 1.00 + 4.00} = 0.96 \]
 \end{minipage}
 
 The results show that out these two actuations, the second one (the curve) would have been selected by the algorithm. This is mainly because safety has a much higher weight than direction when summarizing factors. Obviously, this has not been a complete actuation search because the example consisted of only two actuations, while the the dynamic window can consist of tens or even hundreds of possible alternatives. As I mentioned earlier, the width and the height of the dynamic window depends on the car's and the environments characteristics, while its resolution can be set in the parameters (see DYNAMIC\_WINDOW\_ANGLE\_RESOLUTION and DYNAMIC\_WINDOW\_SPEED\_RESOLUTION in \ref{chap:input_parameters}).
