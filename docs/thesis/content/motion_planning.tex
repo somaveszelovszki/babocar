@@ -16,9 +16,30 @@ As a part of my diploma project, I implemented the latter, a local obstacle avoi
 
 Out of these methods, velocity-based algorithms are by far the most popular, due to their being relatively easy to comprehend and implement and because of their low hardware requirements. As the mapping node and the local planner that I designed need to run on a processor with limited resources, I also chose a velocity-based obstacle avoidance method, using velocity obstacles, with dynamic windowing.
 
-\section{Method}
+After reading briefly about several motion planning algorithms, I found two different approaches that I thought was worth looking into more deeply.
 
-The planner algorithm I implemented uses velocity obstacles to determine which configurations of the car are safe. Velocity obstacle methods (described in \cite{VelocityForbiddenMap} and in \citep{VelocityObstacles}) are based on the following statement: \textit{Assuming a given a given vehicle configuration (position, orientation, speed and wheel angle), the time until collision with a given static or dynamic object in the map can be calculated.} Therefore, velocity obstacle-based methods calculate this collision time for all surrounding objects and for all vehicle velocities. thus creating a velocity obstacle map, or forbidden velocity map (also referred to as dynamic velocity space in \cite{DynamicMotionPlanningSurvey}). Using the dynamic window approach is advised in this step,as it filters out non-reachable velocities before collision-time calculations, thus decreasing the execution time of the algorithm.
+One was the collision cone approach explained in \cite{CollisionCone}. This algorithm creates a cone that is designed in a way that it encloses the vehicle and also the obstacle it needs to avoid (see figure \ref{collision_cones}). The cone defines how probable a collision is to happen using a given speed relative to the other object.
+
+\begin{figure}[!ht]
+	\centering
+	\subfloat[Between point and circle]
+	{
+		\includegraphics[height=48mm]{figures/raw/collision_cone_point_circle.png}
+		\label{collision_cone_point_circle}
+	}
+	\subfloat[Between point and irregular geometry]
+	{
+		\includegraphics[height=48mm]{figures/raw/collision_cone_point_irregular_geometry.png}
+		\label{collision_cone_point_irregular_geometry}
+	}
+	\caption{Collision cones}
+	\label{collision_cones}
+\end{figure}
+
+The other method was to use velocity obstacles (described in \cite{VelocityForbiddenMap} and in \cite{VelocityObstacles}). These methods are based on the following statement: \textit{Assuming a given a given vehicle configuration (position, orientation, speed and wheel angle), the time until collision with a given static or dynamic object in the map can be calculated.} Therefore, velocity obstacle-based methods calculate this collision time for all surrounding objects and for all vehicle velocities. thus creating a velocity obstacle map, or forbidden velocity map (also referred to as dynamic velocity space in \cite{DynamicMotionPlanningSurvey}) that defines how safe given velocities are. Another implementation is explained in \cite{ReactivePathPlanning}, where the above mentioned two approaches are mixed while creating a virtual plane that enables the car to navigate in a dynamic environment.
+
+\section{Method}
+The planner algorithm I implemented uses velocity obstacles to determine which configurations of the car are safe.  Using the dynamic window approach is advised in this step, as it filters out non-reachable velocities before collision-time calculations, thus decreasing the execution time of the algorithm.
 
 Given this velocity obstacle map, the algorithm has a basic knowledge of the reachable velocities and their level of safety. These safety levels provide a good starting point for further calculations, trajectory and collision estimations. My algorithm converts the forbidden velocity map's collision times to safety factors, but also takes the destination point's position and the target speed into consideration when selecting the next actuator outputs. The next graph shows all the sub-tasks of the local trajectory planner algorithm.
 

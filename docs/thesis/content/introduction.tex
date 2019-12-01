@@ -51,7 +51,7 @@ The vehicle supports the development and testing of multiple smaller projects (m
 The Robot Operating System (ROS) is a \textbf{set of software libraries} and tools that help you build robot applications. From drivers to state-of-the-art algorithms, and with powerful developer tools, ROS has what you need for your next robotics project. And it's all \textbf{open source}.
 \end{quote}
 
-The above description is quoted from their \href{https://www.ros.org/}{website}. Short as it may be, their description does point out that ROS is a software framework for robotic applications. Wikipedia also has a brief and comprehensible \href{https://en.wikipedia.org/wiki/Robot_Operating_System}{article} about ROS, in which it states that:
+The above description is quoted\footnote{As the short descriptions on ROS pages are pretty straightforward, I am going to quote from them whenever possible.} from their \href{https://www.ros.org/}{website}. Short as it may be, their description does point out that ROS is a software framework for robotic applications. Wikipedia also has a brief and comprehensible \href{https://en.wikipedia.org/wiki/Robot_Operating_System}{article} about ROS, in which it states that:
 
 \begin{quote}
 Although ROS is \textbf{not an operating system}, it provides services designed for a heterogeneous computer cluster such as hardware abstraction, low-level device control, implementation of commonly used functionality, message-passing between processes, and package management. Running sets of ROS-based processes are represented in a \textbf{graph architecture} where processing takes place in nodes that may receive, post and multiplex sensor data, control, state, planning, actuator, and other messages. Despite the importance of reactivity and low latency in robot control, ROS itself is not a real-time OS (RTOS). It is possible, however, to integrate ROS with real-time code.
@@ -59,7 +59,7 @@ Although ROS is \textbf{not an operating system}, it provides services designed 
 
 So what is ROS exactly? It is a framework that helps building robot applications. It is basically a large set of software components with an own build system. It is not an operating system, therefore it needs one under it. Although it may be installed on Debian and Windows 10 as well, its main target OS is Ubuntu. For this reason, the chosen OS for the computers in the project became Ubuntu (versions Artful and Bionic are supported).
 
-All ROS applications have a graph architecture, meaning that they are considered as a set of separate processes (nodes) that are connected via messages. The standard defines some popular message types, but supports custom messages as well. The communication through messages is based on the publish-subscribe model, a publisher provides some data in the form of messages that all subscribed nodes can read. The implementation of the message-passing, the used networks layer and the transmission and reception of the messages are hidden from the application. ROS handles the delivery between different processes and even different hosts.
+All ROS applications have a graph architecture, meaning that they are considered as a set of separate processes (nodes) that are connected via messages. These message are published on topics, which are message bus names. The standard defines some popular message types, but supports custom messages as well. The communication through messages is based on the publish-subscribe model, a publisher provides some data on a topic in the form of messages that all subscribed nodes can read. The implementation of the message-passing, the used networks layer and the transmission and reception of the messages are hidden from the application. ROS handles the delivery between different processes and even different hosts.
 
 What ROS guarantees is a stable build system and architecture that helps developers create multi-process applications relatively easy, with reliable message-passing over a configurable transport layer (TCP by default). However, these features would not be enough for developers to consider ROS a relevant candidate for a robotic application framework, easy-to-integrate tools and a detailed documentation are also necessary. Fortunately, ROS does include these.
 
@@ -68,7 +68,91 @@ Its documentation is comprehensible and covers most topics that developers may n
 \subsection{Useful ROS tools}
 ROS comes with numerous tools that are plug-and-play compatible any applications, due to that fact that ROS apps are just a set of independent nodes - once opened, these tools become nodes in the ROS graph and they can communicate with the other nodes via messages.
 
-One of most essential tool is \href{http://wiki.ros.org/rviz}{rviz}, a 3D visualization tool. rviz supports a wide range of elements that it can display (camera images, maps, markers, point clouds, robot models, etc.), and the developers also have the option to implement custom display plugins for their own types.
+Most of these tools enable the developer to monitor the ROS graph, the existing nodes and the connections among them. Let me mention a few of these programs that proved themselves elementary during working with ROS.
+
+The first one is \href{http://wiki.ros.org/rqt_graph}{rqt\_graph}, which is GUI tool for visualizing the ROS graph - the nodes and the message connections among them. Figure \ref{rqt_graph} shows part of the \textit{vr-car} ROS graph represented using rqt\_graph. The nodes are shown in the ellipses, and the arrows among them are the topics, on which the messages are sent.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=\textwidth]{figures/raw/rqt_graph.png}
+	\caption{Visualizing the ROS graph using rqt\_graph}
+	\label{rqt_graph}
+\end{figure}
+
+A useful command-line tool is \href{http://wiki.ros.org/rostopic}{rostopic}, which may be used to list, search and monitor message topics. For example executing \textit{rostopic list} while the \textit{vr-car} project is running produces the following output:
+
+\begin{minipage}{\textwidth}
+\begin{lstlisting}[language=bash]
+soma@Soma-Ubuntu:~$ rostopic list
+/Global_planner_wrapper/plan
+/camera1/VRcar/camera
+/camera1/VRcar/camera/compressed
+/camera1/VRcar/camera/compressed/parameter_descriptions
+/camera1/VRcar/camera/compressed/parameter_updates
+/camera1/VRcar/camera/compressedDepth
+/camera1/VRcar/camera/compressedDepth/parameter_descriptions
+/camera1/VRcar/camera/compressedDepth/parameter_updates
+/camera1/VRcar/camera/theora
+/camera1/VRcar/camera/theora/parameter_descriptions
+/camera1/VRcar/camera/theora/parameter_updates
+/camera1/camera_info
+/camera1/parameter_descriptions
+/camera1/parameter_updates
+/clicked_point
+/clock
+/front_scan
+/gazebo/link_states
+/gazebo/model_states
+/gazebo/parameter_descriptions
+/gazebo/parameter_updates
+/gazebo/set_link_state
+/gazebo/set_model_state
+/globalTrajectory
+/initialpose
+/joint_states
+/lidar_pcl
+/lidar_scan
+/move_base/global_costmap/costmap
+/move_base/global_costmap/costmap_updates
+/move_base/local_costmap/costmap
+/move_base/local_costmap/costmap_updates
+/move_base_simple/goal
+/obstacles
+/odom
+/particlecloud
+/path_planner/path_visualization
+/path_planner/path_visualization_array
+/rear_scan
+/rosout
+/rosout_agg
+/static_grid
+/static_grid_updates
+/tf
+/tf_static
+/vrcar/filtered_control
+\end{lstlisting}
+\end{minipage}
+
+For robotic applications, coordinate transformations and frame tracking in time are essential. Fortunately, ROS has an off-the-shelf solution for coordinate frame handling, this program is called tf. Its \href{http://wiki.ros.org/tf}{documentation} briefly explains that
+
+\begin{quote}
+	tf is a package that lets the user keep track of multiple coordinate frames over time. tf maintains the relationship between coordinate frames in a tree structure buffered in time, and lets the user transform points, vectors, etc between any two coordinate frames at any desired point in time.
+\end{quote}
+
+And for visualizing the tf tree, \href{http://wiki.ros.org/rqt}{rqt} may be used.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=\textwidth]{figures/raw/rqt.png}
+	\caption{Visualizing the tf tree using rqt}
+	\label{rqt_graph}
+\end{figure}
+
+In many cases, algorithm testing consists of various iterations, and it is handy to provide the program the same inputs over and over. For this purpose, ROS has a tool called \href{http://wiki.ros.org/rosbag}{rosbag}, which is able to record and play back messages. This way, the whole ROS graph may be simulated by replaying the node outputs. Debugging algorithms is much easier using rosbag recordings, than having to recreate the same situations running the actual nodes.
+
+The tools mentioned above were programs that help developers to monitor or interfere with the ROS graph and node communications. However, there are standalone applications, too, that are, in a way, independent from the ROS graph overall, they work like regular graph nodes that have certain inputs and outputs.
+
+One of most essential standalone program is \href{http://wiki.ros.org/rviz}{rviz}, a 3D visualization tool. rviz supports a wide range of elements that it can display (camera images, maps, markers, point clouds, robot models, etc.), and the developers also have the option to implement custom display plugins for their own types.
 
 \begin{figure}[!ht]
 	\centering
@@ -85,48 +169,70 @@ For vehicle applications such as the \textit{vr-car} project, the typical displa
 
 So one of the nodes in the project's graph needs to publish the odometry messages, and no further coding is needed, rviz may be opened and odometry will be displayed.
 
-Another useful program is \href{http://gazebosim.org/}{Gazebo}, which is an open-source 3D robotics simulator that can be connected to ROS easily.
+Testing in real life, with the real target host may be difficult and expensive. My diploma project is a perfect example for this, because the test car that operates as the host for the ROS nodes was very rarely accessible for me, as I was developing the project from home. Therefore, having to test my algorithm with the actual \textit{vr-car} vehicle would have been a struggle. Fortunately, \href{http://gazebosim.org/}{Gazebo}, which is an open-source 3D robotics simulator, can be connected to ROS easily. With the help of this software, I was able to simulate the car (alongside the sensors and actuator fixed on it) on my computer. What Gazebo provides according to their website is
 
-In the next sections I am going to explain the ROS graph and the message-passing between nodes using a simplified model of the \textit{vr-car} project, while also describing the features of the application and most useful developer tools provided by ROS.
+\begin{quote}
+a robust physics engine, high-quality graphics, and convenient programmatic and graphical interfaces.
+\end{quote}
+
+Simulating in Gazebo is relatively more difficult than visualizing in rviz. At every simulation start, Gazebo needs to be given a world describing the simulation environment, and objects to place in the world (e.g. in the simulation represented in figure \ref{gazebo} the world consists of the boxes, while the object placed in the world is the red car).
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=\textwidth]{figures/raw/gazebo.png}
+	\caption{Gazebo}
+	\label{gazebo}
+\end{figure}
+
+The simulated world is defined by an SDF file. Quoting from their\href{http://sdformat.org}{website}:
+
+\begin{quote}
+SDF is an XML format that describes objects and environments for robot simulators, visualization, and control. Originally developed as part of the Gazebo robot simulator, SDF was designed with scientific robot applications in mind. Over the years, SDF has become a stable, robust, and extensible format capable of describing all aspects of robots, static and dynamic objects, lighting, terrain, and even physics.
+\end{quote}
+
+And the objects are defined by Unified Robot Description Format (URDF) files. These are also XML descriptors that define the structure of an object by links and joints. A basic URDF file containing a single cylinder looks like the following (the example is taken from one of the \href{http://wiki.ros.org/urdf/Tutorials}{URDF tutorials} provided by ROS):
+
+\begin{minipage}{\textwidth}
+\begin{lstlisting}[language=XML]
+<?xml version="1.0"?>
+<robot name="mokifej_foni">
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.6" radius="0.2"/>
+      </geometry>
+    </visual>
+  </link>
+</robot>
+\end{lstlisting}
+\end{minipage}
+
+Both the SDF world and the URDF models can be opened, edited and saved in Gazebo, thus making the creation and update of these files easy. These models were already created by another member of the \textit{vr-car} project, so I was able to simulate the car without any difficulty or extra work, which was a great help during the development of my algorithms.
+
+In the next sections I am going to explain the ROS graph and the message-passing between nodes using a simplified model of the \textit{vr-car} project, while also describing the features of the application.
 
 \subsection{Remote drive}
 The first (and probably simplest to comprehend) feature of the car is the ability to control it remotely, using either a PC keyboard, a joystick or a set of racing wheel and pedals.
 
-In order to make this possible, the car definitely needs a node that controls the car's actuators according to an input actuation. For simplicity, let's assume that this input actuation (a ROS message) contains a target speed and wheel angle that the module has to handle as a reference. Having direct control of the car's motors (the accelerator DC motor and the steering servo) and of the necessary sensors (e.g. a rotary encoder for measuring speed) the control is manageable.
+In order to make this possible, the car definitely needed a node that controls the car's actuators according to an input actuation. For simplicity, let's assume that this input actuation (a ROS message) contains a target speed and wheel angle that the module has to handle as a reference. Having direct control of the car's motors (the accelerator DC motor and the steering servo) and of the necessary sensors (e.g. a rotary encoder for measuring speed) the control is manageable.
 
-Besides this control module, the graph must contain another node, that reads driver interactions (key strokes, joystick state or steering wheel and pedal positions), converts these to driver commands (target actuations) and publishes the correspondent messages that the control node listens to. Note, that these input nodes are implemented separately for the input types - there is a module for keyboard input, one for handling the joystick and a third one for reading the racing wheel and pedal data\footnote{The racing wheel and the throttle and brake pedals are actually handled on a separate Windows host, and their positions are forwarded to another host running ROS.}.
+Besides this control module, the graph contains another node, that reads driver interactions (key strokes, joystick state or steering wheel and pedal positions), converts these to driver commands (target actuations) and publishes the correspondent messages that the control node listens to. Note, that these input nodes are implemented separately for the input types - there is a module for keyboard input, one for handling the joystick and a third one for reading the racing wheel and pedal data\footnote{The racing wheel and the throttle and brake pedals are actually handled on a separate Windows host, and their positions are forwarded to another host running ROS.}.
 
-\tikzset{
-	base_node/.style    = {rectangle, rounded corners, draw=black,
-		minimum width=4.5cm, minimum height=1cm,
-		text centered, font=\sffamily},
-	common_node/.style  = {base_node, fill=orange!15},
-	decoration={brace},
-	tuborg/.style={decorate},
-	tubnode_left/.style={midway, left=2pt},
-	tubnode_right/.style={midway, right=2pt}
-}
-
-\begin{figure}[!ht]
-	\begin{tikzpicture}[
-	node distance=1.5cm,
-	every node/.style={fill=white, font=\sffamily}, align=center]
-	% Input nodes
-	\node (input_keyboard)    [common_node]                          {Keyboard};
-	\node (input_joystick)    [common_node, xshift=5.25cm]           {Joystick};
-	\node (input_wheel_pedal) [common_node, xshift=10.5cm]           {Racing wheel + pedal};
-	% Control node
-	\node (control)           [common_node, below of=input_joystick] {Control};
-	% Connections
-	\draw[->]    (input_keyboard) -- (control);
-	\draw[->]    (input_joystick) -- (control);
-	\draw[->] (input_wheel_pedal) -- (control);
-	\end{tikzpicture}
-	\caption{Remote drive}
-	\label{remote_drive}
-\end{figure}
-
-With one input module being active, the graph now contains two processes - the input and the control nodes. These two nodes are communicating through a message that contains speed and wheel angle reference values. The setup may be called finished, as it is working. However, ROS provides tools that take little amount of code to incorporate, but prove to be very useful.
+With one input module being active, the graph now contains two processes - the input and the control nodes. These two nodes are communicating through a message that contains speed and wheel angle reference values.
 
 \subsection{\textit{vr-drive}}
+Another feature of the car is that the user drive it using one of the input methods listed above while 'seeing what the car sees'. This is implemented by reading the video stream from the camera fixed on the vehicle and transferring it to the user's PC. The user can see the images via an Oculus Rift VR headset. To make it more realistic, the camera on the car is moved in a way that it follows the user's head movements.
 
+\subsection{2D mapping}
+As figures \ref{car_setup_front} and \ref{car_setup_rear} show, the car is equipped with a front and a rear 2-dimensional, 360 degree LIDAR. The sensors are hard to see because they are fixed under the chassis. The reason for them being hidden is that they are meant to detect low-height objects as well, therefore they could not have been placed on the top of the car, which would be the usual placement of LIDARs. But as the front LIDAR cannot see backward effectively because it is covered by the wheels (and the same goes for the rear LIDAR looking forward), both LIDARs are needed in order to have a 360 degree view angle. But because the two LIDARs are placed on two different locations on the car, creating one map from their measured values is not trivial. To solve this issue, a special node called \textit{scans\_merger} has been added to project, with the task to merge the scan data from the front and rear LIDARs, thus creating a joined scan.
+
+\subsection{3D mapping}
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[height=72mm]{figures/raw/3D_lidar.png}
+	\caption{Creating a 3D map by tilting a 2D LIDAR}
+	\label{tilt_lidar}
+\end{figure}
+
+3D mapping is implemented using the front LIDAR, which is also a 2-dimensional, 360 degree sensor, but it is placed on a gimbal, and is tilted forward and backward with ~0.5 Hz frequency. Because of the tilting movement, the LIDAR scans a different plane in every step. And merging these planes creates a 3D map (see figure \ref{tilt_lidar}).
