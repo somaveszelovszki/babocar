@@ -83,7 +83,6 @@ A useful command-line tool is \href{http://wiki.ros.org/rostopic}{rostopic}, whi
 
 \begin{minipage}{\textwidth}
 \begin{lstlisting}[language=bash]
-soma@Soma-Ubuntu:~$ rostopic list
 /Global_planner_wrapper/plan
 /camera1/VRcar/camera
 /camera1/VRcar/camera/compressed
@@ -107,7 +106,6 @@ soma@Soma-Ubuntu:~$ rostopic list
 /gazebo/parameter_updates
 /gazebo/set_link_state
 /gazebo/set_model_state
-/globalTrajectory
 /initialpose
 /joint_states
 /lidar_pcl
@@ -117,7 +115,6 @@ soma@Soma-Ubuntu:~$ rostopic list
 /move_base/local_costmap/costmap
 /move_base/local_costmap/costmap_updates
 /move_base_simple/goal
-/obstacles
 /odom
 /particlecloud
 /path_planner/path_visualization
@@ -125,7 +122,6 @@ soma@Soma-Ubuntu:~$ rostopic list
 /rear_scan
 /rosout
 /rosout_agg
-/static_grid
 /static_grid_updates
 /tf
 /tf_static
@@ -266,7 +262,6 @@ The project has a goal to make the car able to navigate from its actual position
 	% Active nodes
 	\node (scans_merger)     [vr_car_node, below of=rear_scan]                 {Scans merger};
 	\node (gmapping)         [vr_car_node, below of=scans_merger]              {gmapping};
-	\node (rviz)             [vr_car_node, below of=gmapping]                  {rviz};
 	\node (navigation)       [vr_car_node, below of=gmapping]                  {Navigation};
 	\node (3d_mapping)       [vr_car_node, below of=top_scan]                  {3D mapping};
 	\node (control)          [vr_car_node, below of=navigation, yshift=-1.5cm] {Control};
@@ -277,7 +272,6 @@ The project has a goal to make the car able to navigate from its actual position
 	\draw[->]      (rear_scan) -- (scans_merger);
 	\draw[->]   (scans_merger) -- (gmapping);
 	\draw[->]       (gmapping) -- (navigation);
-	\draw[->]           (rviz) -- (navigation);
 	\draw[->]  (control_input) -- (control);
 	\draw[->]     (navigation) -- (control);
 	\draw[->]        (control) -- (actuators);
@@ -335,7 +329,6 @@ The other node was a local trajectory planner node, that (based on the mapping n
 	% Active nodes
 	\node (scans_merger)     [vr_car_node, below of=rear_scan]                           {Scans merger};
 	\node (gmapping)         [vr_car_node, below of=scans_merger]                        {gmapping};
-	\node (rviz)             [vr_car_node, below of=gmapping]                            {rviz};
 	\node (navigation)       [vr_car_node, below of=gmapping]                            {Navigation};
 	\node (3d_mapping)       [vr_car_node, below of=top_scan]                            {3D mapping};
 	\node (control)          [vr_car_node, below of=navigation, yshift=-3.0cm] 			 {Control};
@@ -349,7 +342,6 @@ The other node was a local trajectory planner node, that (based on the mapping n
 	\draw[->]      (rear_scan) -- (scans_merger);
 	\draw[->]   (scans_merger) -- (gmapping);
 	\draw[->]       (gmapping) -- (navigation);
-	\draw[->]           (rviz) -- (navigation);
 	\draw[->]  (control_input) -- (control);
 	\draw[->]        (control) -- (actuators);
 	\draw[->]       (top_scan) -- (3d_mapping);

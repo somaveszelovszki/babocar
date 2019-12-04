@@ -58,7 +58,7 @@ Given this velocity obstacle map, the algorithm has a basic knowledge of the rea
   tubnode_right/.style={midway, right=2pt}
 }
 
-\begin{figure}[!ht]
+\begin{center}
     \begin{tikzpicture}[
             node distance=1.5cm,
             every node/.style={fill=white, font=\sffamily}, align=center]
@@ -102,9 +102,9 @@ Given this velocity obstacle map, the algorithm has a basic knowledge of the rea
         \draw[->] (fitness_factors) -- (get_best_act);
         \draw[->]    (get_best_act) -- (acker_drive);
     \end{tikzpicture}
-    \caption{Motion planning method}
+    \captionof{figure}{Motion planning method}
     \label{motion_planning_method}
-\end{figure}
+\end{center}
 
 The diagram consists of 4 sub-graphs - these are also marked on the diagram with different colors. The orange sub-graph describes the environment-independent sub-tasks of the algorithm - finding the next destination point, updating the target actuation and the dynamic window. The yellow one is about the method of reducing the size of the static map by filtering out those points that are not needed for the trajectory planning. The red side sub-graph shows that for dynamic objects, trajectory calculation is also necessary besides filtering. And the last one (populating the bottom area of the graph, marked with green colour) contains the main planning logic. The sections under \ref{chap:motion_planning} explain these sub-graphs in detail.
 
@@ -455,11 +455,11 @@ A fitness factor is a number in the [0.0 1.0] interval describing how good (how 
 
 Describes how near the actuation's speed is to the target speed.
 
-1.0: The actuation's speed is exactly the same as the target speed.
+\textbf{1.0}: The actuation's speed is exactly the same as the target speed.
 
-0.5: The actuation's speed is halfway between the target speed and the worst possible candidate.
+\textbf{0.5}: The actuation's speed is halfway between the target speed and the worst possible candidate.
 
-0.0: The actuation's speed is the maximum permitted speed to the opposite direction (worst possible candidate).
+\textbf{0.0}: The actuation's speed is the maximum permitted speed to the opposite direction (worst possible candidate).
 \end{minipage}
 
 \begin{minipage}{\textwidth}
@@ -467,11 +467,11 @@ Describes how near the actuation's speed is to the target speed.
 
 Describes how near the actuation's wheel angle is to the target wheel angle.
 
-1.0: The actuation's wheel angle is exactly the same as the target wheel angle.
+\textbf{1.0}: The actuation's wheel angle is exactly the same as the target wheel angle.
 
-0.5: The actuation's wheel angle is halfway between the target wheel angle and the worst possible candidate.
+\textbf{0.5}: The actuation's wheel angle is halfway between the target wheel angle and the worst possible candidate.
 
-0.0: The actuation's wheel angle is the maximum permitted wheel angle to the opposite direction (worst possible candidate).
+\textbf{0.0}: The actuation's wheel angle is the maximum permitted wheel angle to the opposite direction (worst possible candidate).
 \end{minipage}
 
 \begin{minipage}{\textwidth}
@@ -479,11 +479,11 @@ Describes how near the actuation's wheel angle is to the target wheel angle.
 
 Describes how safe the actuation is, meaning how improbable a collision is.
 
-1.0: Using the actuation, a collision within time interval will not happen.
+\textbf{1.0}: Using the actuation, a collision within time interval will not happen.
 
-0.5: The actuation leads to a collision, but the obstacle is farther than the car's brake distance.
+\textbf{0.5}: The actuation leads to a collision, but the obstacle is farther than the car's brake distance.
 
-0.0: The actuation leads to an unavoidable collision.
+\textbf{0.0}: The actuation leads to an unavoidable collision.
 \end{minipage}
 
 Let me explain these factors with two simple examples, regarding the same scenario (shown above in figure figure \ref{what_is_the_best_actuation}).
@@ -592,7 +592,7 @@ Note that the collision time of the actuation is always is the [0 {T\textsubscri
 Now that the speed, direction and safety factors have been calculated for all possible actuations, the only sub-task left is to find the best actuation.
 
 \begin{minipage}{\textwidth}
-\subsection{Best actuation}
+\subsection{The best actuation}
 
 The best possible actuation is always the one with the highest fitness factors. The factors of an actuation are summarized to one number (which will then become \textit{the} fitness of the actuation) the following way:
 
@@ -658,6 +658,6 @@ The results show that out these two actuations, the second one (the curve) would
 \subsection{Publishing Ackermann driving control}
 The hard part of the node's work is done, the best possible actuation has been found. The very last task is to publish this desired speed and wheel angle pair to the other ROS nodes that control the car.
 
-This publication happens on topic \textit{/vrcar/manual\_control}, using \href{http://docs.ros.org/jade/api/ackermann_msgs/html/msg/AckermannDrive.html}{ackermann\_msgs/AckermannDrive} messages.
+This publication happens on topic \textit{/vrcar/manual\_control}, using \href{http://docs.ros.org/jade/api/ackermann_msgs/html/msg/AckermannDrive.html}{\textit{ackermann\_msgs/AckermannDrive}} messages.
 
 The actuator nodes will use these messages to propagate the requested values to the DC motor and the steering servo, and thus, the control pipe has reached its end.
