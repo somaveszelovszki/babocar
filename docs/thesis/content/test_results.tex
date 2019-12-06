@@ -90,7 +90,7 @@ The first example is still a quite simple one. The car is given a straight traje
 	\label{local_planner_test_straight_traj_static_obj}
 \end{minipage}
 
-The simulation images always display the Gazebo simulation on the right and the rviz visualization on the left. Let me briefly summarize how the objects are displayed in rviz. The car has red colour, the target trajectory is marked by the green line. The LIDAR scan consists of the red dots and the map points are either white (free), grey (unknown) or black (occupied). Therefore, static objects appear as black masses in the map. Each dynamic object is marked with a blue circle representing its position and size, and a green arrow for its speed vector.
+The simulation images always display the Gazebo simulation on the right and the rviz visualization on the left. Let me briefly summarize how the objects are displayed in rviz. The car has red colour, the target trajectory is marked by the green line. The LIDAR scan consists of the red dots and the map points are either white (free), grey (unknown) or black (occupied). Therefore, static objects appear as black masses in the map. Each dynamic object is marked with a blue circle representing its position and size, and a green arrow for its speed vector. The car's target trajectory is always pointing downwards, therefore in every test cases the car is trying to navigate to the bottom of the page.
 
 As the image series \ref{local_planner_test_straight_traj_static_obj} show, the car successfully avoids the object and then keeps to the trajectory again.
 
@@ -161,6 +161,28 @@ While the car does manage to avoid both obstacles successfully, it looses the tr
 \end{center}
 
 \subsection{Real-world testing}
-I tested the above mentioned first two scenarios (straight target trajectory with either one static or one dynamic object) with the real \textit{vr-car} in a real environment.
+I tested the above mentioned first two scenarios with the real \textit{vr-car} in a real environment.
 
-TODO
+In the real world scenarios, the captured video is displayed on the right, while the left side of the image contains the rviz visualization recorded alongside the video footage. The trajectory is always pointing forward, as the videos were captured from behind the car. The rviz visualizations are rotated to match the orientation of the car - so the car is moving upwards in the visualizations.
+
+The first example show a scenario in which the the car is in a corridor, with a room opening from the it to the right. The target trajectory is straight again (the car needs to navigate through the corridor), but there is a static obstacle in the way.
+
+\begin{minipage}{\textwidth}
+	\centering
+	\includegraphics[width=0.75\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_1.png}
+	
+	\vspace{0.5cm}
+	\centering
+	\includegraphics[width=0.75\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_2.png}
+	
+	\vspace{0.5cm}
+	\centering
+	\includegraphics[width=0.75\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_3.png}
+	
+	\vspace{0.5cm}
+	\centering
+	\includegraphics[width=0.75\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_4.png}
+	
+	\captionof{figure}{Straight trajectory, 1 static obstacle}
+	\label{local_planner_real_test_joined_straight_traj_1_static_obj}
+\end{minipage}
