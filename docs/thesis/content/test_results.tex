@@ -161,28 +161,57 @@ While the car does manage to avoid both obstacles successfully, it looses the tr
 \end{center}
 
 \subsection{Real-world testing}
+\label{chap:real_world_testing}
 I tested the above mentioned first two scenarios with the real \textit{vr-car} in a real environment.
 
 In the real world scenarios, the captured video is displayed on the right, while the left side of the image contains the rviz visualization recorded alongside the video footage. The trajectory is always pointing forward, as the videos were captured from behind the car. The rviz visualizations are rotated to match the orientation of the car - so the car is moving upwards in the visualizations.
 
-The first example show a scenario in which the the car is in a corridor, with a room opening from the it to the right. The target trajectory is straight again (the car needs to navigate through the corridor), but there is a static obstacle in the way.
+The first example shows a scenario in which the the car is in a corridor, with a room opening from the it to the right. The target trajectory is straight again (the car needs to navigate through the corridor, keeping to left if possible), but there is a static obstacle in the way. The expected behaviour is to bypass the obstacle from the right, then keep to the left side of the corridor while moving forward.
 
 \begin{minipage}{\textwidth}
 	\centering
-	\includegraphics[width=0.75\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_1.png}
+	\includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_1.png}
 	
 	\vspace{0.5cm}
 	\centering
-	\includegraphics[width=0.75\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_2.png}
+	\includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_2.png}
 	
 	\vspace{0.5cm}
 	\centering
-	\includegraphics[width=0.75\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_3.png}
+	\includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_3.png}
 	
 	\vspace{0.5cm}
 	\centering
-	\includegraphics[width=0.75\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_4.png}
+	\includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_4.png}
 	
 	\captionof{figure}{Straight trajectory, 1 static obstacle}
 	\label{local_planner_real_test_joined_straight_traj_1_static_obj}
 \end{minipage}
+
+The second example is the same as the previous one but with a dynamic object coming towards the car. For this test, the mapping node had to be started in single LIDAR mode (see SINGLE\_LIDAR in \ref{chap:mapping_input_parameters}) in order to use the scan data provided by the top LIDAR instead of the front and rear ones. This was necessary in order to detect obstacles at a circa 1.2 meter height (above the waist-line). With this modification, the mapping node was able to detect the movement of a human as one solid, linearly moving body, instead of detecting a pair of feet moving non-linearly. 
+
+\begin{center}
+	\includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_1.png}
+	
+	\vspace{0.5cm}
+	\includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_2.png}
+	
+	\vspace{0.5cm}
+	\includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_3.png}
+	
+	\vspace{0.5cm}
+	\includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_4.png}
+	
+	\vspace{0.5cm}
+	\includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_5.png}
+	
+	\vspace{0.5cm}
+	\includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_6.png}
+	
+	\captionof{figure}{Straight trajectory, I dynamic obstacle}
+	\label{local_planner_real_test_joined_straight_traj_1_dynamic_obj}
+\end{center}
+
+The expected behaviour was to bypass the walking obstacle from the right, the same way as in the previous example. The car managed to do that, but it passed so close to the person, that he needed to stop his leg for a moment not to kick the car when being next to it. Note that the minimum kept distance from obstacles is configurable (see MIN\_KEPT\_DISTANCE in \ref{chap:motion_planner_input_parameters}). With the correct tuning of this parameter, these situations can be avoided. Please also note that the above described two real-world tests were the results of several unsuccessful attempts.
+
+An interesting fact for this last scenario is that, due to the top LIDAR being used instead of the ones fixed at ankle-height, short objects (such as the box on the right side of the corridor) are no detected. This is the reason why, by default, the car is using the front and rear LIDARs for obstacle detection and avoidance.

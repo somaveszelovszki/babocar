@@ -110,7 +110,7 @@ The diagram consists of 4 sub-graphs - these are also marked on the diagram with
 
 \begin{minipage}{\textwidth}
 \section{Input parameters}
-\label{chap:input_parameters}
+\label{chap:motion_planner_input_parameters}
 The following input parameters can manipulate the motion planning node:
 
 \begin{itemize}
@@ -177,11 +177,11 @@ However, the destination point must not be chosen too far, either, because it st
     \label{traj_rounding}
 \end{figure}
 
-After empirical testing, the optimal distance of the destination point and the nearest trajectory point (marked with yellow and black dots in figure \ref{dest_point_update}) proved to be around 4 times the distance between the car's front and rear axles (see CAR\_FRONT\_REAR\_WHEEL\_AXIS\_DIST in \ref{chap:input_parameters}). Note, that this value largely depends on the dynamic window's maximum angular velocity limit and the car's mechanical characteristics (e.g. using a faster steering servo or a 4-wheel steering car would reduce the optimal distance).
+After empirical testing, the optimal distance of the destination point and the nearest trajectory point (marked with yellow and black dots in figure \ref{dest_point_update}) proved to be around 4 times the distance between the car's front and rear axles (see CAR\_FRONT\_REAR\_WHEEL\_AXIS\_DIST in \ref{chap:motion_planner_input_parameters}). Note, that this value largely depends on the dynamic window's maximum angular velocity limit and the car's mechanical characteristics (e.g. using a faster steering servo or a 4-wheel steering car would reduce the optimal distance).
 In order to follow the straight segments of the target path before curves, I implemented the length of the invisible string (the distance in front of the nearest trajectory point) to change dynamically, according to the car's current distance from the trajectory. This tweak suppressed the rounding effect mentioned above, but not entirely. This is now considered a limitation of the algorithm's efficiency.
 
 \subsection{Calculating the target actuation}
-After the destination point has been selected, the next step is to calculate the target actuation - the speed and steering angle pair that would lead the car to the destination point. First, the target wheel angle is calculated using linear algebra (see figure \ref{calc_steering_angle}). The target speed calculation is based on two factors. The first is the target speed limit, which we expect the car to keep, given no extraordinary circumstances. This should be set to a safe speed that the car can keep up during its travel (see MAX\_SPEED\_FWD and MAX\_SPEED\_BWD in \ref{chap:input_parameters}). The actual target speed will never exceed this limit. But the target steering angle may require this target speed to be lower, because the car can manage to reach higher speeds safely when going straight, than when in a sharp bend.
+After the destination point has been selected, the next step is to calculate the target actuation - the speed and steering angle pair that would lead the car to the destination point. First, the target wheel angle is calculated using linear algebra (see figure \ref{calc_steering_angle}). The target speed calculation is based on two factors. The first is the target speed limit, which we expect the car to keep, given no extraordinary circumstances. This should be set to a safe speed that the car can keep up during its travel (see MAX\_SPEED\_FWD and MAX\_SPEED\_BWD in \ref{chap:motion_planner_input_parameters}). The actual target speed will never exceed this limit. But the target steering angle may require this target speed to be lower, because the car can manage to reach higher speeds safely when going straight, than when in a sharp bend.
 
 \begin{figure}[!ht]
     \centering
@@ -210,7 +210,7 @@ The program chooses between the target actuation modes dynamically, and the exte
 \subsection{Updating the dynamic window}
 In every iteration, the dynamic window must also be updated, which is independent from the target actuation, but depends on the current actuation, which is obtained by reading the odometry message published another node in the car. I have already described the structure of the \href{http://docs.ros.org/melodic/api/nav_msgs/html/msg/Odometry.html}{\textit{\textit{nav\_msgs/Odometry}}} message earlier in \ref{chap:absolute_points}.
 
-The 'width' and 'height' of the window (which is defined by the maximum speed and wheel angle change in one iteration) mostly depends on the car's physical, mechanical and other characteristics (motor-wheel dead-time, maximum motor torque, speed controller's parameters, maximum angular velocity of the steering servo), but the environment's characteristics (air resistance, friction) also influence them. The maximum speed and wheel angle change are settable parameters (see MAX\_ACCELERATION and MAX\_WHEEL\_ANGULAR\_VELOCITY in \ref{chap:input_parameters}). The dynamic window is represented in figure \ref{dynamic_window}. The red arrow shows the current actuation (speed and wheel angle pair). The dynamic window itself appears on the image as the grey area under the arrow heads. Every actuation within the dynamic window's area is reachable within the next step. When the current actuation is not near a hard limit, it is the center of the dynamic window.
+The 'width' and 'height' of the window (which is defined by the maximum speed and wheel angle change in one iteration) mostly depends on the car's physical, mechanical and other characteristics (motor-wheel dead-time, maximum motor torque, speed controller's parameters, maximum angular velocity of the steering servo), but the environment's characteristics (air resistance, friction) also influence them. The maximum speed and wheel angle change are settable parameters (see MAX\_ACCELERATION and MAX\_WHEEL\_ANGULAR\_VELOCITY in \ref{chap:motion_planner_input_parameters}). The dynamic window is represented in figure \ref{dynamic_window}. The red arrow shows the current actuation (speed and wheel angle pair). The dynamic window itself appears on the image as the grey area under the arrow heads. Every actuation within the dynamic window's area is reachable within the next step. When the current actuation is not near a hard limit, it is the center of the dynamic window.
 
 \begin{figure}[!ht]
     \centering
@@ -219,8 +219,8 @@ The 'width' and 'height' of the window (which is defined by the maximum speed an
     \label{dynamic_window}
 \end{figure}
 
-However, the size of the dynamic window may reduce when its size is limited by the hard limits of speed and wheel angle. A perfect example for this situation is when the steering angle is at its maximum at either left or right direction (see MAX\_WHEEL\_ANGLE in \ref{chap:input_parameters}), in which case changing the angle further to this direction is impossible. This results in the dynamic window getting halved - as only its original right or left side is reachable, depending on the current steering direction. It is trivial that in these cases such as the previous example, the current actuation is no longer in the center of the dynamic window.
-Another important characteristics of the dynamic window is its resolution - both speed and angular velocity, which are settable parameters (see DYNAMIC\_WINDOW\_SPEED\_RESOLUTION and DYNAMIC\_WINDOW\_ANGLE\_RESOLUTION in \ref{chap:input_parameters}). Increasing the resolution leads to smoother control, but also increases the node's resource need and runtime.
+However, the size of the dynamic window may reduce when its size is limited by the hard limits of speed and wheel angle. A perfect example for this situation is when the steering angle is at its maximum at either left or right direction (see MAX\_WHEEL\_ANGLE in \ref{chap:motion_planner_input_parameters}), in which case changing the angle further to this direction is impossible. This results in the dynamic window getting halved - as only its original right or left side is reachable, depending on the current steering direction. It is trivial that in these cases such as the previous example, the current actuation is no longer in the center of the dynamic window.
+Another important characteristics of the dynamic window is its resolution - both speed and angular velocity, which are settable parameters (see DYNAMIC\_WINDOW\_SPEED\_RESOLUTION and DYNAMIC\_WINDOW\_ANGLE\_RESOLUTION in \ref{chap:motion_planner_input_parameters}). Increasing the resolution leads to smoother control, but also increases the node's resource need and runtime.
 
 The managing the dynamic window internally, the motion planning node also publishes the dynamic window's possible actuations in a \href{http://docs.ros.org/melodic/api/visualization_msgs/html/msg/MarkerArray.html}{\textit{visualization\_msgs::MarkerArray}} on topic \textit{available\_velocities}, so that they can be viewed on-the-fly in rviz.
 
@@ -261,7 +261,7 @@ Figure \ref{rviz_2_near_static_objects_filter} shows that the mapped environment
     \end{tabular}
 \end{center}
 
-is a good guess. The maximum speed and deceleration and settable parameters (see MAX\_SPEED\_FWD, MAX\_SPEED\_BWD and MAX\_ACCELERATION in \ref{chap:input_parameters}). Optimization is possible using the car's speed vector, and filtering out those points that are very far from the current direction.
+is a good guess. The maximum speed and deceleration and settable parameters (see MAX\_SPEED\_FWD, MAX\_SPEED\_BWD and MAX\_ACCELERATION in \ref{chap:motion_planner_input_parameters}). Optimization is possible using the car's speed vector, and filtering out those points that are very far from the current direction.
 
 \subsection{Static collision times}
 Collision times need to be changed for all surrounding obstacles in order to be able to build the dynamic velocity obstacle map. Due to the fact that the number of static points is usually high compared to the dynamic points, the collision times are calculated separately, so that the calculation can be optimized for static objects. Collision check needs to be executed for all the actuations within the dynamic window. The algorithm is the following.
@@ -361,7 +361,7 @@ is a good guess (note that the radius is twice as large as in the static case). 
 
 \subsection{Trajectory calculation}
 \label{trajectory_calculation}
-Now that the irrelevant dynamic objects have been filtered out, the next step is to calculate the kept obstacles' trajectories. Trajectory calculation is done using an iterative method - for each obstacle, with a given time step (see COLLISION\_CHECK\_TIME\_STEP in \ref{chap:input_parameters}) the algorithm start iterating, updates the obstacle's position and orientation in each step and saves into an array of configurations - this array will become the trajectory itself. \textit{But how many steps should be saved?} may be an interesting question, to which the answer is also: it depends. It depends on how the application logic uses these trajectories. For my application, the needed number of steps is:
+Now that the irrelevant dynamic objects have been filtered out, the next step is to calculate the kept obstacles' trajectories. Trajectory calculation is done using an iterative method - for each obstacle, with a given time step (see COLLISION\_CHECK\_TIME\_STEP in \ref{chap:motion_planner_input_parameters}) the algorithm start iterating, updates the obstacle's position and orientation in each step and saves into an array of configurations - this array will become the trajectory itself. \textit{But how many steps should be saved?} may be an interesting question, to which the answer is also: it depends. It depends on how the application logic uses these trajectories. For my application, the needed number of steps is:
 
 \[ N = \frac{3 \cdot \frac{v_{max}}{a_{max}}}{T_{step}} \]
 
@@ -382,7 +382,7 @@ Now that the irrelevant dynamic objects have been filtered out, the next step is
 After the trajectories for all moving obstacles have calculates, the algorithm can move forward, and check for collisions with these objects.
 
 \subsection{Dynamic collision times}
-Calculating the collision times with the dynamic obstacles is not based on linear algebra, like in the static case, but is executed in an iterative way. For all possible actuations (actuations that are present in the dynamic window), a trajectory is calculated - the same way that it has already been calculated for the other dynamic objects in the map. Using this trajectory and the pre-calculated other trajectories the algorithm iterates through time, updates the objects' configurations in each step according to their trajectories, and checks collisions. The iteration's time step is the configurable value that has been used before (see COLLISION\_CHECK\_TIME\_STEP in \ref{chap:input_parameters}). The simulation time (until the iterations go) is:
+Calculating the collision times with the dynamic obstacles is not based on linear algebra, like in the static case, but is executed in an iterative way. For all possible actuations (actuations that are present in the dynamic window), a trajectory is calculated - the same way that it has already been calculated for the other dynamic objects in the map. Using this trajectory and the pre-calculated other trajectories the algorithm iterates through time, updates the objects' configurations in each step according to their trajectories, and checks collisions. The iteration's time step is the configurable value that has been used before (see COLLISION\_CHECK\_TIME\_STEP in \ref{chap:motion_planner_input_parameters}). The simulation time (until the iterations go) is:
 
 \[ N = \frac{3 \cdot \frac{v}{a_{max}}}{T_{step}} \]
 
@@ -505,7 +505,7 @@ The following images show two possible actuations in a situation (both are withi
     \label{possible_actuations}
 \end{figure}
 
-Figure \ref{possible_actuations} shows the two example actuations. As a precondition, the target speed and wheel angle must be defined. The target speed is always defined by the maximum allowed speed (see MAX\_SPEED\_FWD and MAX\_SPEED\_BWD in \ref{chap:input_parameters}) and the target wheel angle. For this is only an example, let me assume that the car is in perfect orientation and arbitrarily set the target speed to MAX\_SPEED\_FWD, and the target wheel angle to zero. Let us assume that we have already calculated the collision times for each possible actuation.
+Figure \ref{possible_actuations} shows the two example actuations. As a precondition, the target speed and wheel angle must be defined. The target speed is always defined by the maximum allowed speed (see MAX\_SPEED\_FWD and MAX\_SPEED\_BWD in \ref{chap:motion_planner_input_parameters}) and the target wheel angle. For this is only an example, let me assume that the car is in perfect orientation and arbitrarily set the target speed to MAX\_SPEED\_FWD, and the target wheel angle to zero. Let us assume that we have already calculated the collision times for each possible actuation.
 
 \begin{minipage}{\textwidth}
 During factor calculations, the following acronyms are used:
@@ -602,19 +602,19 @@ The best possible actuation is always the one with the highest fitness factors. 
 \begin{center}
     \begin{tabular}{ | c | c | }
         \hline
-        F\textsubscript{i}  		& The fitness of actuation \textit{i}															\\
+        F\textsubscript{i}  		& The fitness of actuation \textit{i}                                                                         \\
         \hline
-        F\textsubscript{speed,i}  	& The speed factor for actuation \textit{i}														\\
+        F\textsubscript{speed,i}  	& The speed factor for actuation \textit{i}                                                                   \\
         \hline
-        F\textsubscript{dir,i}  	& The direction factor for actuation \textit{i}													\\
+        F\textsubscript{dir,i}  	& The direction factor for actuation \textit{i}                                                               \\
         \hline
-        F\textsubscript{safety,i}  	& The safety factor for actuation \textit{i}													\\
+        F\textsubscript{safety,i}  	& The safety factor for actuation \textit{i}                                                                  \\
         \hline
-        w\textsubscript{speed}  	& The weight of the speed factor (see W\_SPEED\_FACTOR in \ref{chap:input_parameters})			\\
+        w\textsubscript{speed}  	& The weight of the speed factor (see W\_SPEED\_FACTOR in \ref{chap:motion_planner_input_parameters})         \\
         \hline
-        w\textsubscript{dir}  		& The weight of the direction factor (see W\_DIRECTION\_FACTOR in \ref{chap:input_parameters})	\\
+        w\textsubscript{dir}  		& The weight of the direction factor (see W\_DIRECTION\_FACTOR in \ref{chap:motion_planner_input_parameters}) \\
         \hline
-        w\textsubscript{safety}  	& The weight of the safety factor (see W\_SAFETY\_FACTOR in \ref{chap:input_parameters})		\\
+        w\textsubscript{safety}  	& The weight of the safety factor (see W\_SAFETY\_FACTOR in \ref{chap:motion_planner_input_parameters})       \\
         \hline
     \end{tabular}
 \end{center}
@@ -653,7 +653,7 @@ An the final fitness is:
 \[ F_{2} = \frac{1.00 \cdot 2.00 + 0.75 \cdot 1.00 + 1.00 \cdot 4.00}{2.00 + 1.00 + 4.00} = 0.96 \]
 \end{minipage}
 
-The results show that out these two actuations, the second one (the curve) would have been selected by the algorithm. This is mainly because safety has a much higher weight than direction when summarizing factors. Obviously, this has not been a complete actuation search because the example consisted of only two actuations, while the the dynamic window can consist of tens or even hundreds of possible alternatives. As I mentioned earlier, the width and the height of the dynamic window depends on the car's and the environments characteristics, while its resolution can be set in the parameters (see DYNAMIC\_WINDOW\_ANGLE\_RESOLUTION and DYNAMIC\_WINDOW\_SPEED\_RESOLUTION in \ref{chap:input_parameters}).
+The results show that out these two actuations, the second one (the curve) would have been selected by the algorithm. This is mainly because safety has a much higher weight than direction when summarizing factors. Obviously, this has not been a complete actuation search because the example consisted of only two actuations, while the the dynamic window can consist of tens or even hundreds of possible alternatives. As I mentioned earlier, the width and the height of the dynamic window depends on the car's and the environments characteristics, while its resolution can be set in the parameters (see DYNAMIC\_WINDOW\_ANGLE\_RESOLUTION and DYNAMIC\_WINDOW\_SPEED\_RESOLUTION in \ref{chap:motion_planner_input_parameters}).
 
 \subsection{Publishing Ackermann driving control}
 The hard part of the node's work is done, the best possible actuation has been found. The very last task is to publish this desired speed and wheel angle pair to the other ROS nodes that control the car.

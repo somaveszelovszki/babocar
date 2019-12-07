@@ -1,0 +1,45 @@
+\appendix
+
+\textbf{Appendix}
+
+The source code of the project may be found on GitHub. Repository URL:
+
+\begin{center}
+\href{https://github.com/somaveszelovszki/babocar}{https://github.com/somaveszelovszki/babocar}
+\end{center}
+
+The repository consists of the following relevant sub-projects (ROS packages):
+
+\begin{enumerate}
+\item \textbf{modules/babocar-core/} Utility types and functions for the nodes
+\item \textbf{modules/babocar-logic/environment-builder/} The mapping node
+\item \textbf{modules/babocar-logic/local-planner/} The trajectory planner node
+\end{enumerate}
+
+All packages are compatible with ROS Melodic projects. For testing the packages, \href{https://github.com/google/googletest}{GTest} was used, which can be \href{http://wiki.ros.org/gtest}{integrated into ROS} easily. In order to build the packages and run their unit tests, execute the following command:
+
+\begin{lstlisting}[language=bash]
+$ catkin_make run_tests
+\end{lstlisting}
+
+To run the mapping or the trajectory planner node, execute
+
+\begin{lstlisting}[language=bash]
+$ rosrun environment_builder decomposer
+\end{lstlisting}
+
+or
+
+\begin{lstlisting}[language=bash]
+$ rosrun local_planner local_obstacle_avoidance
+\end{lstlisting}
+
+respectably.
+
+The raw material (LaTeX files, images) for this thesis is under the \textbf{docs/thesis/} folder.
+
+The videos and simulation screencasts are available in this shared album:
+
+\begin{center}
+	\href{https://photos.app.goo.gl/ULuRRvq1mxC2CRxTA}{https://photos.app.goo.gl/ULuRRvq1mxC2CRxTA}
+\end{center}

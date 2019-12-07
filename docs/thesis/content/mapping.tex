@@ -69,7 +69,7 @@ The diagram consists of 3 sub-graphs - these are also marked on the diagram. The
 
 \begin{minipage}{\textwidth}
 \section{Input parameters}
-\label{chap:input_parameters}
+\label{chap:mapping_input_parameters}
 The following input parameters can manipulate the mapping node:
 
 \begin{itemize}
@@ -444,7 +444,7 @@ Due to the above problem, static map-building needed to be implemented internall
     \end{tabular}
 \end{center}
 
-I chose the most straight-forward way of map-building - each static measurement introduces an occupied point and a free ray in the map. The map's size and resolution can be set as input parameters (see MAP\_SIZE and MAP\_RES in \ref{chap:input_parameters}). \ref{map_ray} visualizes the situation. The green and red grids are the car's current position and the measured point.
+I chose the most straight-forward way of map-building - each static measurement introduces an occupied point and a free ray in the map. The map's size and resolution can be set as input parameters (see MAP\_SIZE and MAP\_RES in \ref{chap:mapping_input_parameters}). \ref{map_ray} visualizes the situation. The green and red grids are the car's current position and the measured point.
 
 \begin{figure}[!ht]
     \centering

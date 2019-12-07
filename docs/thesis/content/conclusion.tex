@@ -14,12 +14,17 @@ Overall, the map-creation and trajectory planning work as expected. If given a m
 \section{Interesting findings and morals}
 As a last thought regarding the subject of the project, let me mention some findings and problems that occurred during the implementation of the mapping and planning algorithms. These thoughts are (in my opinion) worth writing about, because they were surprisingly hard to overcome or simply were unexpected or interesting.
 
-\subsection{Symmetrical map}
+\textbf{Symmetrical map}
+
 The first one is rather a tip than a finding - a tip for myself in the future and anyone who is planning on writing a mapping program. \textit{Don't use a symmetrical map, with the car starting in its center!} Build an asymmetrical map or place the car somewhere \textit{but} the center. It took me at least 3 hours of debugging to find where one of the absolute point angle calculations was wrong, that cause the  map to rotate by 180 degrees. But for quite a long time, this bug didn't event come to my attention, because the map was symmetrical, and therefore was insensitive to a 180 degree rotation.
 
-\subsection{The closing ball}
-\label{chap:closing_ball}
-The second finding is an unexpected mapping problem that I didn't event notice until it ruined the local trajectory planning. It happened when a round object\footnote{In the simulator I used balls as obstacles, because applying a still force to them made them move with a linear speed.} is moving in a straight line, and passes near the car. Because of its round shape, only a half of the object is seen by the LIDAR at every time point. But the half that is visible is changing as the object is passing the car (kind of like the Sun making different parts of the Moon visible, as it's rotating relative to the Earth). But the speed vector calculation is based on the movement of the objects' mass center, which is calculated by the visible points. Therefore, as the visible points select a different half of the object, the mass center changes, and alters the object's speed vector.
+\textbf{Using the top LIDAR}
+
+For one of the examples described in \ref{chap:real_world_testing} the top LIDAR was used as the source for map building, instead of the front and rear LIDARs. Note that this LIDAR is placed at around 1.2 meters high. In interesting characteristics of LIDARs (and all ray-based distance sensors) is that while they see only one horizontal plane they do have an angular error - a range in which they detect obstacles. Besides this error, they may even be fixed imperfectly so that they are not horizontal. Due to this errors, the following situation is very common. Let's assume the car is in a large room with only one obstacle in it. This obstacle is around 8 meters from the car, and has the height of 1.1 meters (its top point 10 centimeters lower than the LIDAR's \textit{y} position). Due to the above mentioned imperfections, the LIDAR's ray hits the obstacle and it is measured successfully. As the car starts moving closer to the obstacle, however, it disappears. While this may be an obvious course of events, it did cause some uncomfortable moments. At the time of starting a simulation the car saw an object, but when getting closer, the object disappeared and the car hit it.
+
+\textbf{The closing ball}
+
+The last finding is an unexpected mapping problem that I didn't event notice until it ruined the local trajectory planning. It happened when a round object\footnote{In the simulator I used balls as obstacles, because applying a still force to them made them move with a linear speed.} is moving in a straight line, and passes near the car. Because of its round shape, only a half of the object is seen by the LIDAR at every time point. But the half that is visible is changing as the object is passing the car (kind of like the Sun making different parts of the Moon visible, as it's rotating relative to the Earth). But the speed vector calculation is based on the movement of the objects' mass center, which is calculated by the visible points. Therefore, as the visible points select a different half of the object, the mass center changes, and alters the object's speed vector.
 
 \begin{figure}[!ht]
 	\centering
