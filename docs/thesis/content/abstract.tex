@@ -10,16 +10,14 @@
 
 A diplomatervezési feladat egy, a tanszéken futó kutatási projekthez kapcsolódik, amelyben egy intelligens autó tesztplatform létrehozása a cél. A platform alapja egy csökkentett méretű (kb. 1:3 méretarányú) autómodell, melyet egy távirányítható játékautóból alakítunk át. A tesztplatform létrehozásának célja különböző navigációs algoritmusok fejlesztésének és valós környezetben történő tesztelésének elősegítése.
 
-A sikeres navigáció és az ütközések elkerülése érdekében fontos, hogy a jármű valós időben detektálni tudja a környező objektumokat, és megfelelően reagáljon rájuk. Ennek elősegítése érdekében az autóplatformon elhelyezésre került egy‑egy vízszintes síkban pásztázó lézeres távolságszkenner (lidar) a jármű elején és hátulján.
+Az alábbi diplomaterv két fontos funkció megvalósítását részletezi, melyek hozzásegítik az autót a sikeres térképezéshez és navigációhoz.
 
-A feladat keretében ezekre a szenzorokra építve kell megvalósítani mozgó objektumok felismerését, azok méretének és sebességvektorának becslésével együtt. Fontos, hogy a jármű el tudja különíteni a statikus és a mozgó akadályokat egymástól. További feladat egy olyan akadályelkerülési módszer megvalósítása az autón, amely az objektumok mozgását is figyelembe véve hozza meg a megfelelő navigációs döntést minden időpillanatban.
+Az egyik funkció egy olyan térképalkotási módszer, mely képes különválasztani a térben érzékelt statikus (nem mozgó) akadályokat a dinamikus (mozgó) objektumoktól. A dolgozat során részletezésre kerül mind a módszer elméleti bemutatása, az algoritmus be- és kimenő adattípusainak és belső működésének részletezése, illetve a szimulációban és a valós autón elvégzett tesztek eredmények kiértékelése.
 
-A megvalósított algoritmusok működését mind szimulált, mind valós környezetben szükséges ellenőrizni. A valós tesztelés történhet a tanszéki járműplatformon, vagy egy kisméretű, egyedileg felépített modellautón is.
-
+A másik funkció az előbb említett térképalkotásra épül. Ennek a feladata a térben elhelyezkedő álló és mozgó objektumok közötti lokális akadályelkerülés. Ez a gyakorlatban egy előre megadott trajektória tartását jelenti, anélkül, hogy bármely akadálynak nekiütközne az autó. A térképezéshez hasonlóan ennek a funkciónak is részletes leírásra kerül mind a működése, mind az algoritmust bemutató tesztesetek.
 
 \vfill
 \selectenglish
-
 
 %----------------------------------------------------------------------------
 % Abstract in English
@@ -28,11 +26,11 @@ A megvalósított algoritmusok működését mind szimulált, mind valós körny
 
 The theme of the thesis is a sub-task of a research project at the Department of Automation and Applied Informatics, with the purpose of designing an intelligent car testing platform. The platform is based on a decreased-size (around 1:3 scale) remote control car model, that has been modified to support self-driving program control. The platform aims to support the development of different navigation algorithms and helping the testing in real environment.
 
-For a successful navigation and obstacle avoidance, the detection of the surrounding objects and reacting accordingly are essential. For the purpose of detection, two horizontal distance scanning sensors (LIDARs) have been placed on the car - one on the front and one on the back.
+The following thesis describes two important features, that help the car perform mapping and navigation.
 
-Part of the task is to implement the detection of the moving obstacles and estimate their sizes and speed vectors. It is important for the car to be able to separate static and moving objects from each other. The other part is developing an obstacle-avoidance method, implemented as an application on the car, that takes the moving objects into consideration while making navigational decisions at every time step.
+One of these features is a mapping algorithm, that is able to separate the static (non-moving) obstacles from the dynamic (moving) objects. During the thesis, the theoretical background, the input and output parameters and the inner operation of the algorithm are described, along with the evaluation of the tests performed in simulation and also with the real car.
 
-The implemented algorithms need to be tested both in simulation and in real environment, that may be executed on  the department's vehicle platform or on a small-scale, custom-build model car.
+The other feature is built on the upper mentioned mapping task. This algorithm performs local obstacle avoidance based on the static and dynamic objects in the map. In practice, this means that the car needs to keep a pre-defined trajectory, without colliding with any obstacles. Similar to the map-building, this feature is also explained in detail, and test cases are also available.
 
 \vfill
 \selectthesislanguage
