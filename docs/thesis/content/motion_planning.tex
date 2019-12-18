@@ -24,12 +24,12 @@ One was the collision cone approach explained in \cite{CollisionCone}. This algo
     \centering
     \subfloat[Between point and circle]
     {
-        \includegraphics[height=48mm]{figures/raw/collision_cone_point_circle.png}
+        \includegraphics[height=48mm]{figures/raw/jpeg/collision_cone_point_circle.jpg}
         \label{collision_cone_point_circle}
     }
     \subfloat[Between point and irregular geometry]
     {
-        \includegraphics[height=48mm]{figures/raw/collision_cone_point_irregular_geometry.png}
+        \includegraphics[height=48mm]{figures/raw/jpeg/collision_cone_point_irregular_geometry.jpg}
         \label{collision_cone_point_irregular_geometry}
     }
     \caption{Collision cones}
@@ -145,7 +145,7 @@ This method requires a destination point in each iteration. This point is prefer
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=40mm]{figures/raw/dest_point_update.png}
+    \includegraphics[height=40mm]{figures/raw/jpeg/dest_point_update.jpg}
     \caption{Updating the destination point}
     \label{dest_point_update}
 \end{figure}
@@ -154,7 +154,7 @@ Choosing a too near destination will result in the car starting to oscillate aro
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=65mm]{figures/raw/traj_oscillation.png}
+    \includegraphics[width=65mm]{figures/raw/jpeg/traj_oscillation.jpg}
     \caption{Oscillation around the target trajectory}
     \label{traj_oscillation}
 \end{figure}
@@ -165,12 +165,12 @@ However, the destination point must not be chosen too far, either, because it st
     \centering
     \subfloat[Rounding sharp peaks]
     {
-        \includegraphics[height=72mm]{figures/raw/traj_round_sharp_peak.png}
+        \includegraphics[height=72mm]{figures/raw/jpeg/traj_round_sharp_peak.jpg}
         \label{traj_round_sharp_peak}
     }
     \subfloat[Rounding curves]
     {
-        \includegraphics[height=72mm]{figures/raw/traj_round_curve.png}
+        \includegraphics[height=72mm]{figures/raw/jpeg/traj_round_curve.jpg}
         \label{traj_round_curve}
     }
     \caption{Trajectory rounding}
@@ -185,7 +185,7 @@ After the destination point has been selected, the next step is to calculate the
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=48mm]{figures/raw/calc_steering_angle.png}
+    \includegraphics[height=48mm]{figures/raw/jpeg/calc_steering_angle.jpg}
     \caption{Calculating the target steering angle}
     \label{calc_steering_angle}
 \end{figure}
@@ -214,7 +214,7 @@ The 'width' and 'height' of the window (which is defined by the maximum speed an
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=60mm]{figures/raw/dynamic_window.png}
+    \includegraphics[height=60mm]{figures/raw/jpeg/dynamic_window.jpg}
     \caption{The dynamic window}
     \label{dynamic_window}
 \end{figure}
@@ -226,7 +226,7 @@ The motion planning node also publishes the dynamic window's possible actuations
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=60mm]{figures/raw/rviz_available_velocities.png}
+    \includegraphics[height=60mm]{figures/raw/jpeg/rviz_available_velocities.jpg}
     \caption{Available velocities in rviz}
     \label{rviz_available_velocities}
 \end{figure}
@@ -240,7 +240,7 @@ Separating the static points from the dynamic objects has both advantages and di
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=110mm]{figures/raw/rviz_2_near_static_objects_filter.png}
+    \includegraphics[height=110mm]{figures/raw/jpeg/rviz_2_near_static_objects_filter.jpg}
     \caption{Static filtering}
     \label{rviz_2_near_static_objects_filter}
 \end{figure}
@@ -272,7 +272,7 @@ First the car's expected movement for the actuation is predicted with a curve. W
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=72mm]{figures/raw/static_collision_time_check_objects.png}
+    \includegraphics[height=72mm]{figures/raw/jpeg/static_collision_time_check_objects.jpg}
     \caption{The car's expected trajectory is a curve}
     \label{static_collision_time_check_objects}
 \end{figure}
@@ -281,7 +281,7 @@ In order to get the collision time, first the algorithm needs to calculate the c
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=72mm]{figures/raw/static_collision_time_check_object_simplification.png}
+    \includegraphics[height=72mm]{figures/raw/jpeg/static_collision_time_check_object_simplification.jpg}
     \caption{Simplifying object shapes}
     \label{static_collision_time_check_object_simplification}
 \end{figure}
@@ -310,7 +310,7 @@ The angular difference between the car and the obstacle (denoted $\gamma$) can b
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=72mm]{figures/raw/static_collision_time_check_angle.png}
+    \includegraphics[height=72mm]{figures/raw/jpeg/static_collision_time_check_angle.jpg}
     \caption{Angular difference between the car and the obstacle}
     \label{static_collision_time_check_angle}
 \end{figure}
@@ -468,7 +468,7 @@ Let's look at the scenario represented in Figure \ref{what_is_the_best_actuation
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=72mm]{figures/raw/rviz_straight_traj_static_object.png}
+    \includegraphics[height=72mm]{figures/raw/jpeg/rviz_straight_traj_static_object.jpg}
     \caption{What is 'the best' actuation?}
     \label{what_is_the_best_actuation}
 \end{figure}
@@ -521,12 +521,12 @@ The following images show two possible actuations in a situation (both are withi
     \centering
     \subfloat[Straight actuation]
     {
-        \includegraphics[height=60mm]{figures/raw/rviz_straight_traj_static_object_straight_actuation.png}
+        \includegraphics[height=60mm]{figures/raw/jpeg/rviz_straight_traj_static_object_straight_actuation.jpg}
         \label{straight_actuation}
     }
     \subfloat[Curved actuation]
     {
-        \includegraphics[height=60mm]{figures/raw/rviz_straight_traj_static_object_curved_actuation.png}
+        \includegraphics[height=60mm]{figures/raw/jpeg/rviz_straight_traj_static_object_curved_actuation.jpg}
         \label{curved_actuation}
     }
     \caption{Possible actuations}

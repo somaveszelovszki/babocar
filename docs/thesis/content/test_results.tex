@@ -14,12 +14,12 @@ Figure \ref{mapping_demo_start} presents the initial situation of the demonstrat
     \centering
     \subfloat[rviz visualization]
     {
-        \includegraphics[height=70mm]{figures/raw/mapping_demo/rviz_start.png}
+        \includegraphics[height=70mm]{figures/raw/jpeg/mapping_demo/rviz_start.jpg}
         \label{mapping_demo_rviz_start}
     }
     \subfloat[Gazebo simulation]
     {
-        \includegraphics[height=70mm]{figures/raw/mapping_demo/gazebo_start.png}
+        \includegraphics[height=70mm]{figures/raw/jpeg/mapping_demo/gazebo_start.jpg}
         \label{mapping_demo_gazebo_start}
     }
     \caption{Initial state - ball is still}
@@ -32,12 +32,12 @@ Once the ball starts moving (see Figure \ref{mapping_demo_ball_moving}), it stop
     \centering
     \subfloat[rviz visualization]
     {
-        \includegraphics[height=70mm]{figures/raw/mapping_demo/rviz_ball_moving.png}
+        \includegraphics[height=70mm]{figures/raw/jpeg/mapping_demo/rviz_ball_moving.jpg}
         \label{mapping_demo_rviz_ball_moving}
     }
     \subfloat[Gazebo simulation]
     {
-        \includegraphics[height=70mm]{figures/raw/mapping_demo/gazebo_ball_moving.png}
+        \includegraphics[height=70mm]{figures/raw/jpeg/mapping_demo/gazebo_ball_moving.jpg}
         \label{mapping_demo_gazebo_ball_moving}
     }
     \caption{The ball is moving}
@@ -50,12 +50,12 @@ When the car starts moving, the map immediately starts to clear out. If we compa
     \centering
     \subfloat[rviz visualization]
     {
-        \includegraphics[height=70mm]{figures/raw/mapping_demo/rviz_car_moving.png}
+        \includegraphics[height=70mm]{figures/raw/jpeg/mapping_demo/rviz_car_moving.jpg}
         \label{mapping_demo_rviz_car_moving}
     }
     \subfloat[Gazebo simulation]
     {
-        \includegraphics[height=70mm]{figures/raw/mapping_demo/gazebo_car_moving.png}
+        \includegraphics[height=70mm]{figures/raw/jpeg/mapping_demo/gazebo_car_moving.jpg}
         \label{mapping_demo_gazebo_car_moving}
     }
     \caption{The car is moving}
@@ -75,16 +75,16 @@ As a 0th step, I tested if the algorithm follows a straight, then a curved traje
 The first example is still a quite simple one. The car is given a straight trajectory, but there is a static obstacle in its way. The expected behaviour is to bypass the object while staying as close to the trajectory as possible, and when the car has moved past the obstacle, it should keep to the trajectory again.
 
 \begin{minipage}{\textwidth}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_static_obj_1.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_static_obj_1.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_static_obj_2.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_static_obj_2.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_static_obj_3.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_static_obj_3.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_static_obj_4.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_static_obj_4.jpg}
 
     \captionof{figure}{Straight trajectory, static obstacle}
     \label{local_planner_test_straight_traj_static_obj}
@@ -97,16 +97,16 @@ As Figure \ref{local_planner_test_straight_traj_static_obj} shows, the car succe
 The second example is similar to the first one, but has one major difference: the object to avoid is not static but is moving opposite the car, with a speed nearly equal to the car's.
 
 \begin{minipage}{\textwidth}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_dyn_obj_1.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_dyn_obj_1.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_dyn_obj_2.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_dyn_obj_2.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_dyn_obj_3.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_dyn_obj_3.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_dyn_obj_4.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_dyn_obj_4.jpg}
 
     \captionof{figure}{Straight trajectory, dynamic obstacle}
     \label{local_planner_test_straight_traj_dyn_obj}
@@ -117,16 +117,16 @@ Comparing Figure \ref{local_planner_test_straight_traj_static_obj}/2 and Figure 
 The scenario represented in Figure \ref{local_planner_test_straight_traj_faster_obj_from_behind} is different from the previous ones in a way. This is the first situation where an actuation that stops the car would cause a collision. That is because in this scenario, a faster object is approaching the vehicle from behind. To prevent a crash, the car must deviate from its original trajectory in order to let the faster obstacle pass by. Then it can continue on its original route again. Personally, this is my favourite scenario of all.
 
 \begin{minipage}{\textwidth}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_faster_obj_from_behind_1.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_faster_obj_from_behind_1.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_faster_obj_from_behind_2.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_faster_obj_from_behind_2.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_faster_obj_from_behind_3.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_faster_obj_from_behind_3.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_straight_traj_faster_obj_from_behind_4.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_straight_traj_faster_obj_from_behind_4.jpg}
 
     \captionof{figure}{Straight trajectory, faster obstacle from behind}
     \label{local_planner_test_straight_traj_faster_obj_from_behind}
@@ -139,22 +139,22 @@ The last example I am going to present points out another deficiency of the algo
 While the car does manage to avoid both obstacles successfully, it looses the trajectory when circling around the second object. The high-level root of the problem was that the car kept to the right when detecting the obstacle (see Figure \ref{local_planner_test_curved_traj_2_static_objects}/4 captures this time snap), instead of turning left, how it would be advised, seeing that the trajectory turns left after the obstacle. Avoiding the object from the right could still be corrected later, if there wasn't a wall behind it that prevented the car from moving forward. This, however, could not have been predicted beforehand, either. The series of these effect caused the car to get in a position where it could not move any further. In these situations, the car stops, a new global trajectory is needed that navigates it out of the trap.
 
 \begin{center}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_curved_traj_2_static_objects_1.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_curved_traj_2_static_objects_1.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_curved_traj_2_static_objects_2.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_curved_traj_2_static_objects_2.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_curved_traj_2_static_objects_3.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_curved_traj_2_static_objects_3.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_curved_traj_2_static_objects_4.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_curved_traj_2_static_objects_4.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_curved_traj_2_static_objects_5.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_curved_traj_2_static_objects_5.jpg}
 
     \vspace{0.5cm}
-    \includegraphics[width=\textwidth]{figures/raw/local_planner_test_curved_traj_2_static_objects_6.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/local_planner_test_curved_traj_2_static_objects_6.jpg}
 
     \captionof{figure}{Curved trajectory, 2 static obstacles}
     \label{local_planner_test_curved_traj_2_static_objects}
@@ -170,19 +170,19 @@ The first example shows a scenario in which the the car is in a corridor, with a
 
 \begin{minipage}{\textwidth}
     \centering
-    \includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_1.png}
+    \includegraphics[width=0.65\textwidth]{figures/raw/jpeg/local_planner_real_test_joined_straight_traj_1_static_obj_1.jpg}
     
     \vspace{0.5cm}
     \centering
-    \includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_2.png}
+    \includegraphics[width=0.65\textwidth]{figures/raw/jpeg/local_planner_real_test_joined_straight_traj_1_static_obj_2.jpg}
     
     \vspace{0.5cm}
     \centering
-    \includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_3.png}
+    \includegraphics[width=0.65\textwidth]{figures/raw/jpeg/local_planner_real_test_joined_straight_traj_1_static_obj_3.jpg}
     
     \vspace{0.5cm}
     \centering
-    \includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_static_obj_4.png}
+    \includegraphics[width=0.65\textwidth]{figures/raw/jpeg/local_planner_real_test_joined_straight_traj_1_static_obj_4.jpg}
     
     \captionof{figure}{Straight trajectory, 1 static obstacle}
     \label{local_planner_real_test_joined_straight_traj_1_static_obj}
@@ -191,22 +191,22 @@ The first example shows a scenario in which the the car is in a corridor, with a
 The second example is the same as the previous one but with a dynamic object coming towards the car. For this test, the mapping node had to be started in single LIDAR mode (see SINGLE\_LIDAR in Section \ref{chap:mapping_input_parameters}) in order to use the scan data provided by the top LIDAR instead of the front and rear ones. This was necessary in order to detect obstacles at a circa 1.2 meter height (above the waist-line). With this modification, the mapping node was able to detect the movement of a human as one solid, linearly moving body, instead of detecting a pair of feet moving non-linearly. 
 
 \begin{center}
-    \includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_1.png}
+    \includegraphics[width=0.65\textwidth]{figures/raw/jpeg/local_planner_real_test_joined_straight_traj_1_dynamic_obj_1.jpg}
     
     \vspace{0.5cm}
-    \includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_2.png}
+    \includegraphics[width=0.65\textwidth]{figures/raw/jpeg/local_planner_real_test_joined_straight_traj_1_dynamic_obj_2.jpg}
     
     \vspace{0.5cm}
-    \includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_3.png}
+    \includegraphics[width=0.65\textwidth]{figures/raw/jpeg/local_planner_real_test_joined_straight_traj_1_dynamic_obj_3.jpg}
     
     \vspace{0.5cm}
-    \includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_4.png}
+    \includegraphics[width=0.65\textwidth]{figures/raw/jpeg/local_planner_real_test_joined_straight_traj_1_dynamic_obj_4.jpg}
     
     \vspace{0.5cm}
-    \includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_5.png}
+    \includegraphics[width=0.65\textwidth]{figures/raw/jpeg/local_planner_real_test_joined_straight_traj_1_dynamic_obj_5.jpg}
     
     \vspace{0.5cm}
-    \includegraphics[width=0.65\textwidth]{figures/raw/local_planner_real_test_joined_straight_traj_1_dynamic_obj_6.png}
+    \includegraphics[width=0.65\textwidth]{figures/raw/jpeg/local_planner_real_test_joined_straight_traj_1_dynamic_obj_6.jpg}
     
     \captionof{figure}{Straight trajectory, I dynamic obstacle}
     \label{local_planner_real_test_joined_straight_traj_1_dynamic_obj}

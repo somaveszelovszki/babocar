@@ -127,12 +127,12 @@ Among numerous other things, the message contains an array of radial distances (
     \centering
     \subfloat[rviz visualization]
     {
-        \includegraphics[height=48mm]{figures/raw/rviz_lidar_scan.png}
+        \includegraphics[height=48mm]{figures/raw/jpeg/rviz_lidar_scan.jpg}
         \label{rviz_lidar_scan}
     }
     \subfloat[Gazebo simulation]
     {
-        \includegraphics[height=48mm]{figures/raw/gazebo_lidar_scan.png}
+        \includegraphics[height=48mm]{figures/raw/jpeg/gazebo_lidar_scan.jpg}
         \label{gazebo_lidar_scan}
     }
     \caption{LIDAR scan}
@@ -145,7 +145,7 @@ For static map-building, absolute points\footnote{Absolute points are not relati
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/raw/rqt_input.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/rqt_input.jpg}
     \caption{Coordinate frames}
     \label{rqt_input}
 \end{figure}
@@ -177,7 +177,7 @@ This step is best explainable in practice. Let's assume that the position and or
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=80mm]{figures/raw/obstacle_movement.png}
+    \includegraphics[height=80mm]{figures/raw/jpeg/obstacle_movement.jpg}
     \caption{The obstacle is moving}
     \label{obstacle_movement}
 \end{figure}
@@ -186,7 +186,7 @@ Figure \ref{obstacle_movement_lidar} shows how the LIDAR detects the moving obje
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=80mm]{figures/raw/obstacle_movement_lidar.png}
+    \includegraphics[height=80mm]{figures/raw/jpeg/obstacle_movement_lidar.jpg}
     \caption{The detected points of the moving obstacle}
     \label{obstacle_movement_lidar}
 \end{figure}
@@ -195,7 +195,7 @@ To understand the method of dynamic point detection, I removed the LIDAR, its vi
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=50mm]{figures/raw/obstacle_movement_lidar_only.png}
+    \includegraphics[height=50mm]{figures/raw/jpeg/obstacle_movement_lidar_only.jpg}
     \caption{The detected points of the two time-snaps}
     \label{obstacle_movement_lidar_only}
 \end{figure}
@@ -204,7 +204,7 @@ The measured points with their compliance radiuses are presented in Section \ref
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=50mm]{figures/raw/compliance_radiuses.png}
+    \includegraphics[height=50mm]{figures/raw/jpeg/compliance_radiuses.jpg}
     \caption{The compliance radiuses and the dynamic points}
     \label{compliance_radiuses}
 \end{figure}
@@ -215,7 +215,7 @@ Therefore, the result of this separation step needs to be filtered. I implemente
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=50mm]{figures/raw/dynamic_points.png}
+    \includegraphics[height=50mm]{figures/raw/jpeg/dynamic_points.jpg}
     \caption{Point \textit{1} will be filtered out}
     \label{dynamic_points}
 \end{figure}
@@ -229,12 +229,12 @@ The grouping algorithm is based on the supposition that coherent points are clos
     \centering
     \subfloat[Groups]
     {
-        \includegraphics[height=46mm]{figures/raw/groups.png}
+        \includegraphics[height=46mm]{figures/raw/jpeg/groups.jpg}
         \label{groups}
     }
     \subfloat[Gazebo simulation]
     {
-        \includegraphics[height=46mm]{figures/raw/rviz_lidar_scan.png}
+        \includegraphics[height=46mm]{figures/raw/jpeg/rviz_lidar_scan.jpg}
         \label{gazebo_wall_following_car}
     }
     \caption{Distance-based grouping}
@@ -247,12 +247,12 @@ As it is clearly visible on the image, far points that are correspondent to the 
     \centering
     \subfloat[Lidar scan]
     {
-        \includegraphics[height=46mm]{figures/raw/rviz_wall_following_car.png}
+        \includegraphics[height=46mm]{figures/raw/jpeg/rviz_wall_following_car.jpg}
         \label{rviz_wall_following_car}
     }
     \subfloat[Gazebo simulation]
     {
-        \includegraphics[height=46mm]{figures/raw/gazebo_wall_following_car.png}
+        \includegraphics[height=46mm]{figures/raw/jpeg/gazebo_wall_following_car.jpg}
         \label{gazebo_wall_following_car}
     }
     \caption{The \textit{wall following car}}
@@ -263,7 +263,7 @@ To avoid this problem, the algorithm detects if an obstacle is unusually large, 
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/raw/group_cutting.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/group_cutting.jpg}
     \caption{Points on the left of \textit{B} will be cut off}
     \label{group_cutting}
 \end{figure}
@@ -283,7 +283,7 @@ After the dynamic groups have been separated from the static points, additional 
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=50mm]{figures/raw/dynamic_information.png}
+    \includegraphics[height=50mm]{figures/raw/jpeg/dynamic_information.jpg}
     \caption{The calculated information for dynamic obstacles}
     \label{dynamic_information}
 \end{figure}
@@ -297,7 +297,7 @@ Speed vectors are calculated from the change of the center of gravity between me
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{figures/raw/tracking.png}
+    \includegraphics[width=\textwidth]{figures/raw/jpeg/tracking.jpg}
     \caption{Object tracking}
     \label{tracking}
 \end{figure}
@@ -364,7 +364,7 @@ With its \textit{type} set to either \textit{SPHERE} or \textit{ARROW}, these ma
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=50mm]{figures/raw/rviz_moving_object.png}
+    \includegraphics[height=50mm]{figures/raw/jpeg/rviz_moving_object.jpg}
     \caption{Visualizing moving objects}
     \label{rviz_moving_object}
 \end{figure}
@@ -404,12 +404,12 @@ For static map-building, gmapping has already been mentioned as a candidate, but
     \centering
     \subfloat[Map created by gmapping]
     {
-        \includegraphics[height=48mm]{figures/raw/rviz_gmapping_before_move.png}
+        \includegraphics[height=48mm]{figures/raw/jpeg/rviz_gmapping_before_move.jpg}
         \label{rviz_gmapping_before_move}
     }
     \subfloat[Gazebo simulation]
     {
-        \includegraphics[height=48mm]{figures/raw/gazebo_gmapping_before_move.png}
+        \includegraphics[height=48mm]{figures/raw/jpeg/gazebo_gmapping_before_move.jpg}
         \label{gazebo_gmapping_before_move}
     }
     \caption{Initial state - ball is still}
@@ -422,12 +422,12 @@ For static map-building, gmapping has already been mentioned as a candidate, but
     \centering
     \subfloat[Map created by gmapping]
     {
-        \includegraphics[height=48mm]{figures/raw/rviz_gmapping_after_move.png}
+        \includegraphics[height=48mm]{figures/raw/jpeg/rviz_gmapping_after_move.jpg}
         \label{rviz_gmapping_after_move}
     }
     \subfloat[Gazebo simulation]
     {
-        \includegraphics[height=48mm]{figures/raw/gazebo_gmapping_after_move.png}
+        \includegraphics[height=48mm]{figures/raw/jpeg/gazebo_gmapping_after_move.jpg}
         \label{gazebo_gmapping_after_move}
     }
     \caption{Moving state - ball has changed position}
@@ -438,9 +438,9 @@ Due to the above problem, static map-building needed to be implemented internall
 
 \begin{center}
     \begin{tabular}{ c c }
-        \includegraphics[height=3mm]{figures/raw/map_occupied.png} & Occupied (value: 100) \\
-        \includegraphics[height=3mm]{figures/raw/map_unknown.png}  & Unknown (value: 50)   \\
-        \includegraphics[height=3mm]{figures/raw/map_free.png}     & Free (value: 0)       \\
+        \includegraphics[height=3mm]{figures/raw/jpeg/map_occupied.jpg} & Occupied (value: 100) \\
+        \includegraphics[height=3mm]{figures/raw/jpeg/map_unknown.jpg}  & Unknown (value: 50)   \\
+        \includegraphics[height=3mm]{figures/raw/jpeg/map_free.jpg}     & Free (value: 0)       \\
     \end{tabular}
 \end{center}
 
@@ -448,7 +448,7 @@ I chose the most straight-forward way of map-building - each static measurement 
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[height=50mm]{figures/raw/map_ray.png}
+    \includegraphics[height=50mm]{figures/raw/jpeg/map_ray.jpg}
     \caption{Introducing a free ray}
     \label{map_ray}
 \end{figure}
