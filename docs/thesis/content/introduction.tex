@@ -12,7 +12,7 @@ However, the spreading of autonomous vehicles is blocked by several legislative 
 
 Almost all L5 level self-driving applications can be divided into the same sub-tasks, which are perception, environment building, trajectory planning and control.
 
-Perception (or sensor layer) consists of managing a sensor setup that is able to provide the car with the necessary information about its environment and its own state to create a realistic model of the world. One of the hardest question in this area of engineering is how many and what type of sensors to use. It is especially important for automotive manufacturers, for reducing the price of a sensor set on a car makes manufacturing more profitable. Typical sensor setups include 4 front and 4 rear radars for short-range measurements (typically parking purposes), long-range radars facing forward and backward, IMUs\footnote{Inertial measurement units are electronic devices that measure and report a body's specific force, angular rate, and sometimes the orientation of the body, using a combination of accelerometers, gyroscopes, and sometimes magnetometers. (source: \href{https://en.wikipedia.org/wiki/Inertial_measurement_unit}{Wikipedia})} and GPS receivers. Camera-based solutions (like the one Budapest-based AImotive is developing) may also need front- and rear-facing mono- and/or stereo-cameras and fish-eye cameras on the side. Other approaches use LIDARs placed on top of the car (e.g. Uber and Waymo). The price of these laser scanners are sometimes higher than the car they are applied on. While trying to keep them as minimal as possible, manufacturers must create sensor setups that will be fit for the needs of future fully autonomous programs, which may not be estimated currently today. After the setup has been decided on, the perception layer is still in need of an enormous amount of engineering, as it is responsible for handling these sensors --- calibrating them, reading and filtering their values, and forwarding them to the upper-level components of the chain.
+Perception (or sensor layer) consists of managing a sensor setup that is able to provide the car with the necessary information about its environment and its own state to create a realistic model of the world. One of the hardest question in this area of engineering is how many and what type of sensors to use. It is especially important for automotive manufacturers, for reducing the price of a sensor set on a car makes manufacturing more profitable. Typical sensor setups include 4 front and 4 rear radars for short-range measurements (typically parking purposes), long-range radars facing forward and backward, IMUs\footnote{Inertial measurement units are electronic devices that measure and report a body's specific force, angular rate, and sometimes the orientation of the body, using a combination of accelerometers, gyroscopes, and sometimes magnetometers and GPS receivers \cite{wiki_imu}}. Camera-based solutions (like the one Budapest-based AImotive is developing) may also need front- and rear-facing mono- and/or stereo-cameras and fish-eye cameras on the side. Other approaches use LIDARs placed on top of the car (e.g. Uber and Waymo). The price of these laser scanners are sometimes higher than the car they are applied on. While trying to keep them as minimal as possible, manufacturers must create sensor setups that will be fit for the needs of future fully autonomous programs, which may not be estimated currently today. After the setup has been decided on, the perception layer is still in need of an enormous amount of engineering, as it is responsible for handling these sensors --- calibrating them, reading and filtering their values, and forwarding them to the upper-level components of the chain.
 
 Using the filtered, but still raw output of the sensor handling components, these softwares need to make a realistic and fine-grained map of the world surrounding the vehicle. This environment-building sub-task requires various different, preferably independent input sensors, and it implements the fusion of these data. While its inputs are raw camera images, 2D or 3D LIDAR scans and radar measurements, its output is a 2D or 3D (depending on the application) map of the world, possibly published in a standard format for further evaluation. Among many problems this step has to solve are the different measurement frequencies of the sensors (cameras used in seld-driving solutions typically record video at 30 frame/sec, while automotive LIDARs rotate at maximum 20 Hz), the sensor noise that still remains after filtering, and also contradicting measurements coming from different sensors.
 
@@ -51,7 +51,7 @@ The vehicle supports the development and testing of multiple smaller projects (m
 "The Robot Operating System (ROS) is a \textbf{set of software libraries} and tools that help you build robot applications. From drivers to state-of-the-art algorithms, and with powerful developer tools, ROS has what you need for your next robotics project. And it's all \textbf{open source}."
 \end{quote}
 
-The above description is quoted\footnote{As the short descriptions on ROS pages are pretty straightforward, I am going to quote from them whenever possible.} from their \href{https://www.ros.org/}{website}. Short as it may be, their description does point out that ROS is a software framework for robotic applications. Wikipedia also has a brief and comprehensible \href{https://en.wikipedia.org/wiki/Robot_Operating_System}{article} about ROS, in which it states that:
+The above description is quoted\footnote{As the short descriptions on ROS pages are pretty straightforward, I am going to quote from them whenever possible.} from their website \cite{ros}. Short as it may be, their description does point out that ROS is a software framework for robotic applications. Wikipedia also has a brief and comprehensible article \cite{wiki_ros} about ROS, in which it states that:
 
 \begin{quote}
 "Although ROS is \textbf{not an operating system}, it provides services designed for a heterogeneous computer cluster such as hardware abstraction, low-level device control, implementation of commonly used functionality, message-passing between processes, and package management. Running sets of ROS-based processes are represented in a \textbf{graph architecture} where processing takes place in nodes that may receive, post and multiplex sensor data, control, state, planning, actuator, and other messages. Despite the importance of reactivity and low latency in robot control, ROS itself is not a real-time OS (RTOS). It is possible, however, to integrate ROS with real-time code."
@@ -70,7 +70,7 @@ ROS comes with numerous tools that are plug-and-play compatible any applications
 
 Most of these tools enable the developer to monitor the ROS graph, the existing nodes and the connections among them. Let me mention a few of these programs that proved themselves elementary during working with ROS.
 
-The first one is \href{http://wiki.ros.org/rqt_graph}{rqt\_graph}, which is GUI tool for visualizing the ROS graph --- the nodes and the message connections among them. Figure \ref{rqt_graph} shows part of the \textit{vr-car} ROS graph represented using rqt\_graph. The nodes are shown in the ellipses, and the arrows among them are the topics, on which the messages are sent.
+The first one is rqt\_graph \cite{ros_rqt_graph}, which is GUI tool for visualizing the ROS graph --- the nodes and the message connections among them. Figure \ref{rqt_graph} shows part of the \textit{vr-car} ROS graph represented using rqt\_graph. The nodes are shown in the ellipses, and the arrows among them are the topics, on which the messages are sent.
 
 \begin{figure}[!ht]
 	\centering
@@ -79,7 +79,7 @@ The first one is \href{http://wiki.ros.org/rqt_graph}{rqt\_graph}, which is GUI 
 	\label{rqt_graph}
 \end{figure}
 
-A useful command-line tool is \href{http://wiki.ros.org/rostopic}{rostopic}, which may be used to list, search and monitor message topics. For example executing \textit{rostopic list} while the \textit{vr-car} project is running produces the following output:
+A useful command-line tool is rostopic \cite{ros_rostopic}, which may be used to list, search and monitor message topics. For example executing \textit{rostopic list} while the \textit{vr-car} project is running produces the following output:
 
 \begin{minipage}{\textwidth}
 \begin{lstlisting}[language=bash]
@@ -129,13 +129,13 @@ A useful command-line tool is \href{http://wiki.ros.org/rostopic}{rostopic}, whi
 \end{lstlisting}
 \end{minipage}
 
-For robotic applications, coordinate transformations and frame tracking in time are essential. Fortunately, ROS has an off-the-shelf solution for coordinate frame handling, this program is called tf. Its \href{http://wiki.ros.org/tf}{documentation} briefly explains that
+For robotic applications, coordinate transformations and frame tracking in time are essential. Fortunately, ROS has an off-the-shelf solution for coordinate frame handling, this program is called tf. Its documentation \cite{ros_tf} briefly explains that
 
 \begin{quote}
 "tf is a package that lets the user keep track of multiple coordinate frames over time. tf maintains the relationship between coordinate frames in a tree structure buffered in time, and lets the user transform points, vectors, etc between any two coordinate frames at any desired point in time."
 \end{quote}
 
-And for visualizing the tf tree, \href{http://wiki.ros.org/rqt}{rqt} may be used.
+And for visualizing the tf tree, rqt \cite{ros_rqt} may be used.
 
 \begin{figure}[!ht]
 	\centering
@@ -144,11 +144,11 @@ And for visualizing the tf tree, \href{http://wiki.ros.org/rqt}{rqt} may be used
 	\label{rqt_graph}
 \end{figure}
 
-In many cases, algorithm testing consists of various iterations, and it is handy to provide the program the same inputs over and over. For this purpose, ROS has a tool called \href{http://wiki.ros.org/rosbag}{rosbag}, which is able to record and play back messages. This way, the whole ROS graph may be simulated by replaying the node outputs. Debugging algorithms is much easier using rosbag recordings, than having to recreate the same situations running the actual nodes.
+In many cases, algorithm testing consists of various iterations, and it is handy to provide the program the same inputs over and over. For this purpose, ROS has a tool called rosbag \cite{ros_rosbag}, which is able to record and play back messages. This way, the whole ROS graph may be simulated by replaying the node outputs. Debugging algorithms is much easier using rosbag recordings, than having to recreate the same situations running the actual nodes.
 
 The tools mentioned above were programs that help developers to monitor or interfere with the ROS graph and node communications. However, there are standalone applications, too, that are, in a way, independent from the ROS graph overall, they work like regular graph nodes that have certain inputs and outputs.
 
-One of most essential standalone program is \href{http://wiki.ros.org/rviz}{rviz}, a 3D visualization tool. rviz supports a wide range of elements that it can display (camera images, maps, markers, point clouds, robot models, etc.), and the developers also have the option to implement custom display plugins for their own types.
+One of most essential standalone program is rviz \cite{ros_rviz}, a 3D visualization tool. rviz supports a wide range of elements that it can display (camera images, maps, markers, point clouds, robot models, etc.), and the developers also have the option to implement custom display plugins for their own types.
 
 \begin{figure}[!ht]
 	\centering
@@ -157,15 +157,15 @@ One of most essential standalone program is \href{http://wiki.ros.org/rviz}{rviz
 	\label{rviz}
 \end{figure}
 
-For vehicle applications such as the \textit{vr-car} project, the typical displayed types are robot models, odometry, trajectories and maps. Just imagining the simplest car driving project we can, displaying the car's position and orientation could be quite useful. Unsurprisingly, rviz supports the visualization of vehicle odometry (see \href{http://wiki.ros.org/rviz/DisplayTypes/Odometry}{Odometry display type}), and according to its documentation:
+For vehicle applications such as the \textit{vr-car} project, the typical displayed types are robot models, odometry, trajectories and maps. Just imagining the simplest car driving project we can, displaying the car's position and orientation could be quite useful. Unsurprisingly, rviz supports the visualization of vehicle odometry \cite{ros_rviz_Odometry}, and according to its documentation:
 
 \begin{quote}
-"The Odometry display accumulates a \href{http://docs.ros.org/api/nav_msgs/html/msg/Odometry.html}{nav\_msgs/Odometry} message over time, showing them as arrows."
+"The Odometry display accumulates a nav\_msgs/Odometry \cite{ros_msg_Odometry} message over time, showing them as arrows."
 \end{quote}
 
 So one of the nodes in the project's graph needs to publish the odometry messages, and no further coding is needed, rviz may be opened and odometry will be displayed.
 
-Testing in real life, with the real target host may be difficult and expensive. My diploma project is a perfect example for this, because the test car that operates as the host for the ROS nodes was very rarely accessible for me, as I was developing the project from home. Therefore, having to test my algorithm with the actual \textit{vr-car} vehicle would have been a struggle. Fortunately, \href{http://gazebosim.org/}{Gazebo}, which is an open-source 3D robotics simulator, can be connected to ROS easily. With the help of this software, I was able to simulate the car (alongside the sensors and actuator fixed on it) on my computer. What Gazebo provides according to their website is
+Testing in real life, with the real target host may be difficult and expensive. My diploma project is a perfect example for this, because the test car that operates as the host for the ROS nodes was very rarely accessible for me, as I was developing the project from home. Therefore, having to test my algorithm with the actual \textit{vr-car} vehicle would have been a struggle. Fortunately, Gazebo \cite{gazebo}, which is an open-source 3D robotics simulator, can be connected to ROS easily. With the help of this software, I was able to simulate the car (alongside the sensors and actuator fixed on it) on my computer. What Gazebo provides according to their website is
 
 \begin{quote}
 "a robust physics engine, high-quality graphics, and convenient programmatic and graphical interfaces."
@@ -180,13 +180,13 @@ Simulating in Gazebo is relatively more difficult than visualizing in rviz. At e
 	\label{gazebo}
 \end{figure}
 
-The simulated world is defined by an SDF file. Quoting from their \href{http://sdformat.org}{website}:
+The simulated world is defined by an SDF file. Quoting from their website \cite{sdf}:
 
 \begin{quote}
 "SDF is an XML format that describes objects and environments for robot simulators, visualization, and control. Originally developed as part of the Gazebo robot simulator, SDF was designed with scientific robot applications in mind. Over the years, SDF has become a stable, robust, and extensible format capable of describing all aspects of robots, static and dynamic objects, lighting, terrain, and even physics."
 \end{quote}
 
-In the \textit{vr-car} project, the car in the simulation is defined by Unified Robot Description Format (URDF) files. These are also XML descriptors that define the structure of an object by links and joints. A basic URDF file containing a single cylinder looks like the following (the example is taken from one of the \href{http://wiki.ros.org/urdf/Tutorials}{URDF tutorials} provided by ROS):
+In the \textit{vr-car} project, the car in the simulation is defined by Unified Robot Description Format (URDF) files \cite{ros_urdf}. These are also XML descriptors that define the structure of an object by links and joints. A basic URDF file containing a single cylinder looks like the following (the example is taken from one of the URDF tutorials \cite{ros_urdf_tutorials} provided by ROS):
 
 \begin{minipage}{\textwidth}
 \begin{lstlisting}[language=XML]
@@ -222,7 +222,7 @@ Another feature of the car is that the user drive it using one of the input meth
 \subsection{2D mapping}
 As figures \ref{car_setup_front} and \ref{car_setup_rear} show, the car is equipped with a front and a rear 2-dimensional, 360 degree LIDAR. The sensors are hard to see because they are fixed under the chassis. The reason for them being hidden is that they are meant to detect low-height objects as well, therefore they could not have been placed on the top of the car, which would be the usual placement of LIDARs. But as the front LIDAR cannot see backward effectively because it is covered by the wheels (and the same goes for the rear LIDAR looking forward), both LIDARs are needed in order to have a 360 degree view angle. But because the two LIDARs are placed on two different locations on the car, creating one map from their measured values is not trivial. To solve this issue, a special node called \textit{scans\_merger} has been added to project, with the task to merge the scan data from the front and rear LIDARs, thus creating a joined scan.
 
-This scan needs to be evaluated and and kept track over time, while the car is moving, in order to create a map from them. This algorithm could have been initialized as part of the project, but a popular ROS package, \href{http://wiki.ros.org/gmapping}{gmapping} is able to do that outstandingly\footnote{The advantages and drawbacks of gmapping will be discussed in section \ref{chap:mapping}.}.
+This scan needs to be evaluated and and kept track over time, while the car is moving, in order to create a map from them. This algorithm could have been initialized as part of the project, but a popular ROS package, gmapping \cite{ros_gmapping} is able to do that outstandingly\footnote{The advantages and drawbacks of gmapping will be discussed in Section \ref{chap:mapping}.}.
 
 \subsection{3D mapping}
 
@@ -286,7 +286,7 @@ Now that the main features of the \textit{vr-car} has been listed and briefly ex
 \subsection{Avoiding moving obstacles}
 My task as a diploma project was to design, implement and tune two nodes, that embed themselves into the existing graph.
 
-The first one is a mapping node. While there are numerous mapping implementations available in ROS (see gmapping for one example), none of them handles moving objects correctly (I am providing a detailed reasoning in section \ref{chap:mapping}). So the goal of the mapping node was to separate the static points from the moving objects in the map.
+The first one is a mapping node. While there are numerous mapping implementations available in ROS (see gmapping for one example), none of them handles moving objects correctly (I am providing a detailed reasoning in Section \ref{chap:mapping}). So the goal of the mapping node was to separate the static points from the moving objects in the map.
 
 The other node was a local trajectory planner node, that (based on the mapping nodes output of static and dynamic objects) performs local obstacle avoidance considering not only the position but also the velocities of the surrounding obstacles.
 

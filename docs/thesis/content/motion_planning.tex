@@ -191,7 +191,7 @@ After the destination point has been selected, the next step is to calculate the
 \end{figure}
 
 \subsection{External target actuation}
-For easier testing, the node also supports external target actuations, meaning that the target actuation is not calculated from a trajectory, but is directly provided by another node. The external actuation can be set on topic \textit{/vrcar/filtered\_control\_orig}, which is a topic of \href{http://docs.ros.org/jade/api/ackermann_msgs/html/msg/AckermannDrive.html}{\textit{ackermann\_msgs/AckermannDrive}} messages, that have the following layout:
+For easier testing, the node also supports external target actuations, meaning that the target actuation is not calculated from a trajectory, but is directly provided by another node. The external actuation can be set on topic \textit{/vrcar/filtered\_control\_orig}, which is a topic of \textit{ackermann\_msgs/AckermannDrive} \cite{ros_msg_AckermannDrive} messages, that have the following layout:
 
 \begin{minipage}{\textwidth}
 \begin{lstlisting}[language=IDL]
@@ -208,7 +208,7 @@ Among other fields (which are currently not used by the project) it has a \texti
 The program chooses between the target actuation modes dynamically, and the external target actuation has greater priority. So when messages are arriving on the external target actuation topic, they are the ones the algorithm uses, but when these messages cease to arrive, the node automatically switches to trajectory follow mode and calculates the next target actuation according to the given path.
 
 \subsection{Updating the dynamic window}
-In every iteration, the dynamic window must also be updated, which is independent from the target actuation, but depends on the current actuation, which is obtained by reading the odometry message published another node in the car. I have already described the structure of the \href{http://docs.ros.org/melodic/api/nav_msgs/html/msg/Odometry.html}{\textit{\textit{nav\_msgs/Odometry}}} message earlier in Section \ref{chap:absolute_points}.
+In every iteration, the dynamic window must also be updated, which is independent from the target actuation, but depends on the current actuation, which is obtained by reading the odometry message published another node in the car. I have already described the structure of the \textit{nav\_msgs/Odometry} \cite{ros_msg_Odometry} message earlier in Section \ref{chap:absolute_points}.
 
 The 'width' and 'height' of the window (which is defined by the maximum speed and wheel angle change in one iteration) mostly depends on the car's physical, mechanical and other characteristics (motor-wheel dead-time, maximum motor torque, speed controller's parameters, maximum angular velocity of the steering servo), but the environment's characteristics (air resistance, friction) also influence them. The maximum speed and wheel angle change are settable parameters (see MAX\_ACCELERATION and MAX\_WHEEL\_ANGULAR\_VELOCITY in Section \ref{chap:motion_planner_input_parameters}). The dynamic window is represented in Figure \ref{dynamic_window}. The red arrow shows the current actuation (speed and wheel angle pair). The dynamic window itself appears on the image as the grey area under the arrow heads. Every actuation within the dynamic window's area is reachable within the next step. When the current actuation is not near a hard limit, it is the center of the dynamic window.
 
@@ -222,7 +222,7 @@ The 'width' and 'height' of the window (which is defined by the maximum speed an
 However, the size of the dynamic window may reduce when its size is limited by the hard limits of speed and wheel angle. A perfect example for this situation is when the steering angle is at its maximum at either left or right direction (see MAX\_WHEEL\_ANGLE in Section \ref{chap:motion_planner_input_parameters}), in which case changing the angle further to this direction is impossible. This results in the dynamic window getting halved - as only its original right or left side is reachable, depending on the current steering direction. It is trivial that in these cases such as the previous example, the current actuation is no longer in the center of the dynamic window.
 Another important characteristics of the dynamic window is its resolution - both speed and angular velocity, which are settable parameters (see DYNAMIC\_WINDOW\_SPEED\_RESOLUTION and DYNAMIC\_WINDOW\_ANGLE\_RESOLUTION in Section \ref{chap:motion_planner_input_parameters}). Increasing the resolution leads to smoother control, but also increases the node's resource need and runtime.
 
-The motion planning node also publishes the dynamic window's possible actuations in a \href{http://docs.ros.org/melodic/api/visualization_msgs/html/msg/MarkerArray.html}{\textit{visualization\_msgs::MarkerArray}} on topic \textit{available\_velocities}, so that they can be viewed on-the-fly in rviz.
+The motion planning node also publishes the dynamic window's possible actuations in a \textit{visualization\_msgs::MarkerArray} \cite{ros_msg_MarkerArray} on topic \textit{available\_velocities}, so that they can be viewed on-the-fly in rviz.
 
 \begin{figure}[!ht]
     \centering
@@ -233,7 +233,7 @@ The motion planning node also publishes the dynamic window's possible actuations
 
 \section{Static velocity obstacle map}
 \label{chap:static_velocity_obstacle_map}
-Static points in the map are received from the mapping node in \href{http://docs.ros.org/melodic/api/nav_msgs/html/msg/OccupancyGrid.html}{\textit{nav\_msgs/OccupancyGrid}} messages on topic \textit{static\_grid} (see (see \ref{chap:publishing_static_points})), and they populate a very large percent of the car's surroundings, so handling them efficiently can boost up the algorithms runtime performance. Therefore, they are not joined with the dynamic points, but filtered separately, and the collision times are calculated in a way that is optimized for non-moving objects to gain performance.
+Static points in the map are received from the mapping node in \textit{nav\_msgs/OccupancyGrid} \cite{ros_msg_OccupancyGrid} messages on topic \textit{static\_grid} (see (see \ref{chap:publishing_static_points})), and they populate a very large percent of the car's surroundings, so handling them efficiently can boost up the algorithms runtime performance. Therefore, they are not joined with the dynamic points, but filtered separately, and the collision times are calculated in a way that is optimized for non-moving objects to gain performance.
 
 \subsection{Filtering static points}
 Separating the static points from the dynamic objects has both advantages and disadvantages for local motion planning. The most important advantage is that the collision check with static points is much simpler and faster than with dynamic obstacles. A great disadvantage, however, is that the static map contains lots of points, and running a collision check on all of them would cause the algorithm to be unacceptably slow. To prevent this undesired behaviour, a preparatory filter is applied to the map, removing those points from the map, that are too far from the car's current position to be worth keeping. Depending on the environment's characteristics, this step may reduce the run-time of the static collision checks drastically - even to zero, if all the static points are far from the car (e.g. in a large room).
@@ -707,6 +707,6 @@ The results show that out these two actuations, the second one (the curve) would
 \subsection{Publishing Ackermann driving control}
 The hard part of the node's work is done, the best possible actuation has been found. The very last task is to publish this desired speed and wheel angle pair to the other ROS nodes that control the car.
 
-This publication happens on topic \textit{/vrcar/manual\_control}, using \href{http://docs.ros.org/jade/api/ackermann_msgs/html/msg/AckermannDrive.html}{\textit{ackermann\_msgs/AckermannDrive}} messages.
+This publication happens on topic \textit{/vrcar/manual\_control}, using \textit{ackermann\_msgs/AckermannDrive} \cite{ros_msg_AckermannDrive} messages.
 
 The actuator nodes will use these messages to propagate the requested values to the DC motor and the steering servo, and thus, the control pipe has reached its end.

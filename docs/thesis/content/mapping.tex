@@ -2,9 +2,9 @@
 \label{chap:mapping}
 
 \section{Existing implementations}
-This chapter describes the process of building a separate static and a dynamic map (containing non-moving and moving obstacles, respectively) based on radial distance measurements (in this case provided by a LIDAR). Isolating the static and the moving obstacles from each other has its difficulties but also its advantages. First of all, the implemented local track planner calculates safer, more optimized paths if it is informed of both the static and the dynamic obstacles along the path. Secondly, \href{https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping}{SLAM} (Simultaneous localization and mapping) algorithms work better if the their input contains only static objects in the space, because they build an internal map of the world. Passing detections of moving obstacles to a SLAM algorithm may lead to worse localization quality, as they may ruin this map.
+This chapter describes the process of building a separate static and a dynamic map (containing non-moving and moving obstacles, respectively) based on radial distance measurements (in this case provided by a LIDAR). Isolating the static and the moving obstacles from each other has its difficulties but also its advantages. First of all, the implemented local track planner calculates safer, more optimized paths if it is informed of both the static and the dynamic obstacles along the path. Secondly, Simultaneous localization and mapping (SLAM \cite{wiki_slam}) algorithms work better if the their input contains only static objects in the space, because they build an internal map of the world. Passing detections of moving obstacles to a SLAM algorithm may lead to worse localization quality, as they may ruin this map.
 
-As a first sub-task of the mapping project, I checked if any implementation is available already, that can handle dynamic objects. The only possible candidate was \href{http://wiki.ros.org/gmapping}{gmapping}, which is a popular ROS package, used in a wide variety of applications that require map-building and localization. Moreover, the \textit{vr-car} project already used gmapping, when I started working on it. Its SLAM algorithm takes LIDAR measurements as its input and generates an occupancy grid (a 2D map) of the car's environment. By using this map it is able to make corrections to the car's odometry-based position and orientation, which is usually inaccurate. I tried out the package, and the result maps were promising, the generated map was insensitive to the car's longitudinal movements and its rotations. But unfortunately, gmapping's SLAM does not support dynamic objects. See \ref{chap:static_map} for further details. Therefore, gmapping could not be used as the producer of the static map. But that didn't mean it couldn't be used for its second feature, localization. Note, that the mapping implementation I made is not a SLAM algorithm, it is not able to make corrections to the car's pose. So for that purpose, I still needed the help of gmapping, which proved to be very reliable at localization. But the static map-building needed to be implemented internally.
+As a first sub-task of the mapping project, I checked if any implementation is available already, that can handle dynamic objects. The only possible candidate was gmapping \cite{ros_gmapping} (introduced in Section \ref{chap:introduction}), which is a popular ROS package, used in a wide variety of applications that require map-building and localization. Moreover, the \textit{vr-car} project already used gmapping, when I started working on it. Its SLAM algorithm takes LIDAR measurements as its input and generates an occupancy grid (a 2D map) of the car's environment. By using this map it is able to make corrections to the car's odometry-based position and orientation, which is usually inaccurate. I tried out the package, and the result maps were promising, the generated map was insensitive to the car's longitudinal movements and its rotations. But unfortunately, gmapping's SLAM does not support dynamic objects. See \ref{chap:static_map} for further details. Therefore, gmapping could not be used as the producer of the static map. But that didn't mean it couldn't be used for its second feature, localization. Note, that the mapping implementation I made is not a SLAM algorithm, it is not able to make corrections to the car's pose. So for that purpose, I still needed the help of gmapping, which proved to be very reliable at localization. But the static map-building needed to be implemented internally.
 
 \section{Method}
 In order to create two disjunct maps, one static and one dynamic, the key element of the process is the separation of the moving and non-moving obstacles of the measured points. After determining these two disjunct set of points, the maps can be converted to any desired or required format. Static maps are usually published as occupancy grids, while dynamic obstacles need to present information about their speed vector. Occupancy grids do not group the grid points according to their probabilities, therefore they do not know about the obstacles' borders and areas\footnote{In this project, 2D LIDARs were used, therefore the measured objects were seen as 2D shapes that have areas, not 3D objects that have volumes}. Dynamic obstacles however can be either represented as separate points with their own speed vectors, or groups of points, each groups having one speed vector. I chose the latter representation, thus publishing groups that contain a set of points (all the points, ideally) of the same obstacle. This way there is a one-to-one relationship between moving obstacles and groups. The separation and grouping methods of the mapping process is shown on diagram \ref{mapping_method}.
@@ -85,7 +85,7 @@ The following input parameters can manipulate the mapping node:
 This section describes the method of separating dynamic and static points of the input scan. This step is essential in the pipeline of creating two disjunct maps.
 
 \subsection{Input scan}
-The input of the mapping algorithm is a 2D LIDAR scan, consisting of radial distance measurements. Two types of LIDARs were used in the project, \href{http://www.slamtec.com/en/lidar/a1}{RPLidar A1} and \href{http://www.slamtec.com/en/lidar/a2}{RPLidar A2}.
+The input of the mapping algorithm is a 2D LIDAR scan, consisting of radial distance measurements. Two types of LIDARs were used in the project, RPLidar A1 \cite{rplidar_a1} and RPLidar A2 \cite{rplidar_a2}.
 Both types have the following specifications:
 
 \begin{center}
@@ -104,7 +104,7 @@ Both types have the following specifications:
     \end{tabular}
 \end{center}
 
-The devices proved to be reliable, and for a project of this volume, their frequencies, resolutions and ranges were adequate. Their output is a ROS message of type \href{http://docs.ros.org/melodic/api/sensor_msgs/html/msg/LaserScan.html}{\textit{sensor\_msgs/LaserScan}}, which has the following structure:
+The devices proved to be reliable, and for a project of this volume, their frequencies, resolutions and ranges were adequate. Their output is a ROS message of type \textit{sensor\_msgs/LaserScan} \cite{ros_msg_LaserScan} (intro), which has the following structure:
 
 \begin{minipage}{\textwidth}
 \begin{lstlisting}[language=IDL]
@@ -150,7 +150,7 @@ For static map-building, absolute points\footnote{Absolute points are not relati
     \label{rqt_input}
 \end{figure}
 
-As the figure shows, there are 3 coordinate frames that are important to the current case. The \textit{odom} frame is the car odometry's coordinate system. According to this frame, the car's odometry can be calculated using values measured on the vehicle, such as servo position and speed. The odometry is also published as a message of format (\href{http://docs.ros.org/melodic/api/nav_msgs/html/msg/Odometry.html}{\textit{nav\_msgs/Odometry}}), that has the following structure:
+As the figure shows, there are 3 coordinate frames that are important to the current case. The \textit{odom} frame is the car odometry's coordinate system. According to this frame, the car's odometry can be calculated using values measured on the vehicle, such as servo position and speed. The odometry is also published as a message of format \textit{nav\_msgs/Odometry} \cite{ros_msg_Odometry}, that has the following structure:
 
 \begin{minipage}{\textwidth}
 \begin{lstlisting}[language=IDL]
@@ -167,7 +167,7 @@ The \textit{scanner} frame is the LIDAR's coordinate system. The transformation 
 
 The internal static map in my implementation uses this corrected \textit{map} frame as the base for its points, so that its error is minimized. But unfortunately, the static-dynamic separation method cannot use this frame. The reason is that this frame does not get updated on every new scan, but with a much slower frequency. Therefore there are 'jumps' in the car's pose relative to the \textit{map} frame, which would cause false dynamic point detections (see \ref{chap:dynamic_points}). To avoid this undesired situation, the static-dynamic separation uses the \textit{odom} frame as its base, which is provides a more continuous pose-time characteristics than the \textit{map} frame.
 
-Therefore, two transformations are needed for each input point. The transformations are calculated using \href{http://wiki.ros.org/tf}{tf}, which maintains the relationship between coordinate frames in a tree structure (see Figure \ref{rqt_input}) buffered in time, and makes the transformation of points, vectors, etc possible at any desired point in time.
+Therefore, two transformations are needed for each input point. The transformations are calculated using tf \cite{ros_tf}, which maintains the relationship between coordinate frames in a tree structure (see Figure \ref{rqt_input}) buffered in time, and makes the transformation of points, vectors, etc possible at any desired point in time.
 
 \subsection{Dynamic points}
 \label{chap:dynamic_points}
@@ -211,7 +211,7 @@ The measured points with their compliance radiuses are presented in Section \ref
 
 Several conclusions can be drawn from \ref{compliance_radiuses}. The one, and probably most important is that with right parameterizing (number of 'look-up' measurements, compliance radius, etc) this method amplifies the positive\footnote{Previously a distant background was detected, but now a closer object appears.} and negative\footnote{Previously a close object was detected, but now it disappears, and the distant background becomes visible.} changes of the scans. The second remark is that the method does not detect all the points of a moving object. However, due to measurement noise, false detections may happen, and non-moving points may be marked as dynamic.
 
-Therefore, the result of this separation step needs to be filtered. I implemented a filtering step that only keeps those samples in the set of dynamic points, of which the left or right neighbour in the scan has also been marked dynamic. It can be easily compared to \href{https://en.wikipedia.org/wiki/Erosion_(morphology)}{erosion} in image processing, which is able to remove peaks from the image. Let's take a look at \ref{dynamic_points}. The possible dynamic points are marked with blue. The filtering mechanism iterates through each of them, and check both neighbours. As it can be easily read from the figure, point \textit{A} has two neighbours that have been marked static, therefore it will be removed from the set of dynamic points. However, points \textit{B} and \textit{C} both have dynamic neighbours (each other), so they will not be filtered out. This algorithm removes the single-size false detections from the result of the separation.
+Therefore, the result of this separation step needs to be filtered. I implemented a filtering step that only keeps those samples in the set of dynamic points, of which the left or right neighbour in the scan has also been marked dynamic. It can be easily compared to erosion in image processing \cite{wiki_erosion}, which is able to remove peaks from the image. Let's take a look at \ref{dynamic_points}. The possible dynamic points are marked with blue. The filtering mechanism iterates through each of them, and check both neighbours. As it can be easily read from the figure, point \textit{A} has two neighbours that have been marked static, therefore it will be removed from the set of dynamic points. However, points \textit{B} and \textit{C} both have dynamic neighbours (each other), so they will not be filtered out. This algorithm removes the single-size false detections from the result of the separation.
 
 \begin{figure}[!ht]
     \centering
@@ -322,7 +322,7 @@ And the structure of \textit{environment\_builder/DynamicObjectArray} is simply:
 DynamicObject[] objects
 \end{lstlisting}
 
-The node also publishes messages that are useful for visualization and diagnostics or debugging. On topic \textit{obstacles}, visualization messages of type \href{http://docs.ros.org/melodic/api/visualization_msgs/html/msg/MarkerArray.html}{\textit{visualization\_msgs::MarkerArray}} are published. This type of message contains an array of \href{http://docs.ros.org/melodic/api/visualization_msgs/html/msg/Marker.html}{\textit{visualization\_msgs::Marker}}s, which look like the following:
+The node also publishes messages that are useful for visualization and diagnostics or debugging. On topic \textit{obstacles}, visualization messages of type \textit{visualization\_msgs::MarkerArray} \cite{ros_msg_MarkerArray} are published. This type of message contains an array of \textit{visualization\_msgs::Marker}s \cite{ros_msg_Marker}, which look like the following:
 
 \begin{minipage}{\textwidth}
 \begin{lstlisting}[language=IDL]
@@ -369,7 +369,7 @@ With its \textit{type} set to either \textit{SPHERE} or \textit{ARROW}, these ma
     \label{rviz_moving_object}
 \end{figure}
 
-And on topic \textit{diff\_grid}, \href{http://docs.ros.org/melodic/api/nav_msgs/html/msg/OccupancyGrid.html}{\textit{nav\_msgs/OccupancyGrid}}s are published. This is topic is purely for diagnostic and debugging purposes. It represents the dynamics of the map compared to the previous measurement, using an occupancy grid. This means that the occupancy grid will have high values where something changed in the map, an will store low values where the map is still. The algorithm that searches for dynamic objects uses this grid as its basis. The structure of the message is as follows:
+And on topic \textit{diff\_grid}, \textit{nav\_msgs/OccupancyGrid}s \cite{ros_msg_OccupancyGrid} are published. This is topic is purely for diagnostic and debugging purposes. It represents the dynamics of the map compared to the previous measurement, using an occupancy grid. This means that the occupancy grid will have high values where something changed in the map, an will store low values where the map is still. The algorithm that searches for dynamic objects uses this grid as its basis. The structure of the message is as follows:
 
 \begin{minipage}{\textwidth}
 \begin{lstlisting}[language=IDL]
@@ -379,7 +379,7 @@ int8[] data
 \end{lstlisting}
 \end{minipage}
 
-Where \textit{data} stores the actual grid values and \textit{info} is a \href{http://docs.ros.org/melodic/api/nav_msgs/html/msg/MapMetaData.html}{\textit{nav\_msgs/MapMetaData}}, storing meta information about the grid:
+Where \textit{data} stores the actual grid values and \textit{info} is a \textit{nav\_msgs/MapMetaData} \cite{ros_msg_MapMetaData}, storing meta information about the grid:
 
 \begin{minipage}{\textwidth}
 \begin{lstlisting}[language=IDL]
@@ -455,6 +455,6 @@ I chose the most straight-forward way of map-building - each static measurement 
 
 \subsection{Publishing static points}
 \label{chap:publishing_static_points}
-The built static map is published on topic \textit{static\_grid}, which is a \href{http://docs.ros.org/melodic/api/nav_msgs/html/msg/OccupancyGrid.html}{\textit{nav\_msgs/OccupancyGrid}}, just like the previously introduced \textit{diff\_grid} topic's messages.
+The built static map is published on topic \textit{static\_grid}, which is a \textit{nav\_msgs/OccupancyGrid} \cite{ros_msg_OccupancyGrid}, just like the previously introduced \textit{diff\_grid} topic's messages.
 
 With the publishing of the maps the mapping node has finished its task, and the focus now shifts to the motion planning node which calculates actuations that drive the car to the destination without hitting any static or dynamic objects.
