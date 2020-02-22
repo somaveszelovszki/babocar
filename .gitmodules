@@ -25,3 +25,9 @@
 [submodule "3d-models"]
 	path = 3d-models
 	url = git@github.com:somaveszelovszki/babocar-3d-models.git
+[submodule "firmware/line-detector"]
+	path = firmware/line-detector
+	url = git@github.com:somaveszelovszki/babocar-line-detector-firmware.git
+[submodule "circuit/line-detector"]
+	path = circuit/line-detector
+	url = git@github.com:somaveszelovszki/babocar-line-detector-circuit.git
