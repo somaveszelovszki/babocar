@@ -22,3 +22,6 @@
 [submodule "monitor"]
 	path = monitor
 	url = git@github.com:somaveszelovszki/babocar-monitor.git
+[submodule "3d-models"]
+	path = 3d-models
+	url = git@github.com:somaveszelovszki/babocar-3d-models.git
