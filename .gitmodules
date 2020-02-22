@@ -1,18 +1,24 @@
-[submodule "modules/babocar-core"]
-	path = modules/babocar-core
-	url = git@github.com:somaveszelovszki/babocar-core.git
-[submodule "modules/babocar-hw"]
-	path = modules/babocar-hw
-	url = git@github.com:somaveszelovszki/babocar-hw.git
-[submodule "modules/babocar-micro"]
-	path = modules/babocar-micro
-	url = git@github.com:somaveszelovszki/babocar-micro.git
-[submodule "modules/babocar-logic"]
-	path = modules/babocar-logic
-	url = git@github.com:somaveszelovszki/babocar-logic.git
-[submodule "modules/babocar-3d_models"]
-	path = modules/babocar-3d_models
-	url = git@github.com:somaveszelovszki/babocar-3d_models.git
-[submodule "modules/babocar-monitor"]
-	path = modules/babocar-monitor
+[submodule "circuit/voltage-converter"]
+	path = circuit/voltage-converter
+	url = git@github.com:somaveszelovszki/voltage-converter-circuit.git
+[submodule "circuit/control-panel"]
+	path = circuit/control-panel
+	url = git@github.com:somaveszelovszki/babocar-control-panel-circuit.git
+[submodule "circuit/motor-controller"]
+	path = circuit/motor-controller
+	url = git@github.com:somaveszelovszki/babocar-motor-controller-circuit.git
+[submodule "micro-utils"]
+	path = micro-utils
+	url = git@github.com:somaveszelovszki/micro-utils.git
+[submodule "firmware/control-panel"]
+	path = firmware/control-panel
+	url = git@github.com:somaveszelovszki/babocar-control-panel-firmware.git
+[submodule "firmware/motor-controller"]
+	path = firmware/motor-controller
+	url = git@github.com:somaveszelovszki/babocar-motor-controller-firmware.git
+[submodule "circuit/altium-libs"]
+	path = circuit/altium-libs
+	url = git@github.com:somaveszelovszki/altium-libs.git
+[submodule "monitor"]
+	path = monitor
 	url = git@github.com:somaveszelovszki/babocar-monitor.git
