@@ -11,11 +11,10 @@
 # Áramkörök
 ## motor-controller
 - UART + RS422
-- 3F Brushless DC motor? (ehhez valószínűleg STM32F446RE kell erre a NYÁK-ra is)
 - 7V-os DC-DC konverter NYÁK-ok a szervóknak külön vagy ezen a NYÁK-on? legyenek pontosan belőve 7.2V-ra (idén 6.7V-osak lettek)
 - méretcsökkentés
 - csatik áthelyezése
-- fordulatszámmérő csati megváltoztatása
+- fordulatszámmérő csati megváltoztatása?
 - valami normális, egyszerűen összerakható megoldás a kábelezésre (4, 6, esetleg 8 kábel) pl. szalagkábel ilyen csatival: https://lomex.hu/hu/webshop/#/search,43-00-12/stype,1
 - távirányító többi csatornájának a figyelése
 
@@ -35,20 +34,13 @@
 - distance sensor I2C helyett UART + RS422
 - RPi UART soros ellenállások (kb 20 Ohm)
 
-## wheel-panel? :)
-
-Gondoltam arra, hogy csinálhatnánk egy kerek NYÁK-ok, ami tele van LED-ekkel, és rászerelhetnénk a kerekekre.
-Mindent a közönségdíjért :)
-Tennénk rá egy mikrokontrollert, ugyanolyan LED-vezérlőket, mint amik a line-detect-panel-en is vannak, meg egy giroszkópot, és akkor még azt is meg tudja csinálni, hogy ahogy forog a kerék, a képek (pl. :), XD, ;), :o - minden keréken más) vízszintesek maradnak.
-Gondoljátok végig, van-e értelme :)
-
 ## distance-sensor-panel (új)
 
 Elég para volt idén, hogy egy 20cm-es I2C kötötte össze a control-panel-t a távolságszenzorral, és ahogy a szenzort forgattuk, volt, hogy megszakadt a kommunikáció.
 Úgyhogy kéne egy KICSI panel, amit rászerelnénk a szenzorra, lenne rajta egy minimál mikrokontroller (valami 8-lábú STM8, ami tud I2C-t), meg egy RS422, és máris minden király.
 
 - milyen MCU?
-- milyen csati? (4 vezeték)
+- milyen csati? (4 vezeték) - olyan, mint a fordulatszámmérőé?
 - a szenzor (ST VL53L1X) törhető, nekünk elég a kisebb rész
 - rögzítés a szervóra? a mostanihoz van 3D-nyomtatott tok, ha megtartjuk a dimenziókat, azt is használhatjuk
 
