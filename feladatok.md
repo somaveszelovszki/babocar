@@ -40,7 +40,7 @@ Elég para volt idén, hogy egy 20cm-es I2C kötötte össze a control-panel-t a
 Úgyhogy kéne egy KICSI panel, amit rászerelnénk a szenzorra, lenne rajta egy minimál mikrokontroller (valami 8-lábú STM8, ami tud I2C-t), meg egy RS422, és máris minden király.
 
 - milyen MCU?
-- milyen csati? (4 vezeték) - olyan, mint a fordulatszámmérőé?
+- milyen csati?
 - a szenzor (ST VL53L1X) törhető, nekünk elég a kisebb rész
 - rögzítés a szervóra? a mostanihoz van 3D-nyomtatott tok, ha megtartjuk a dimenziókat, azt is használhatjuk
 
