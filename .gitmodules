@@ -31,3 +31,9 @@
 [submodule "circuit/line-detector"]
 	path = circuit/line-detector
 	url = git@github.com:somaveszelovszki/babocar-line-detector-circuit.git
+[submodule "circuit/vl53l0x-adapter"]
+	path = circuit/vl53l0x-adapter
+	url = git@github.com:somaveszelovszki/vl53l0x-adapter-circuit.git
+[submodule "circuit/rs422-adapter"]
+	path = circuit/rs422-adapter
+	url = git@github.com:somaveszelovszki/rs422-adapter-circuit.git
