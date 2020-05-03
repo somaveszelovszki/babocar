@@ -20,11 +20,11 @@ branches['monitor']='master'
 
 for dir in "${!branches[@]}"
 do
-  echo "Entering $dir..."
-  cd $dir
-  git checkout ${branches[$dir]}
-  git pull
-  cd -
+    echo "Entering $dir..."
+    cd $dir
+    git checkout ${branches[$dir]}
+    git pull
+    cd -
 done
 
 echo 'Checkout finished successfully'
