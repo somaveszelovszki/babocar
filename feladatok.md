@@ -15,6 +15,8 @@
 [ ] fordulatszámmérő csati megváltoztatása?
 [ ] távirányító többi csatornájának a figyelése
 [ ] RPi 5V-os tápja erre a NYÁK-ra (@see circuit/voltage-converter)
+[ ] Debug UART + soros ellenállások (kb 20 Ohm)
+[ ] 3V3 vagy 5V a CAN csatlakozón?
 
 ## line-detector
 [x] CAN
@@ -22,6 +24,8 @@
 [x] STM32F446RE menjen rá
 [x] indicator LED-ek az optoszenzorok furatai között
 [x] lekerekített sarkok (árnyékoló miatt)
+[ ] Debug UART + soros ellenállások (kb 20 Ohm)
+[ ] 3V3 vagy 5V a CAN csatlakozón?
 
 ## control-panel
 [x] CAN
@@ -29,6 +33,7 @@
 [x] MPU9250 (I2C) és STEVAL-MKI196V1 (SPI) támogatás
 [x] distance sensor I2C helyett UART + RS422
 [x] RPi UART soros ellenállások (kb 20 Ohm)
+[ ] 3V3 vagy 5V a CAN csatlakozón?
 
 ## distance-sensor-panel (új)
 
