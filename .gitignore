@@ -6,3 +6,5 @@
 *.out
 *.thm
 *.toc
+
+build/
