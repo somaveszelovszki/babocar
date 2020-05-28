@@ -2,7 +2,7 @@
 
 declare -A branches
 
-branches['.']='robonaut'
+branches['.']='master'
 branches['3d-models']='master'
 branches['circuit/altium-libs']='master'
 branches['circuit/control-panel']='master'
