@@ -47,6 +47,7 @@ Elég para volt idén, hogy egy 20cm-es I2C kötötte össze a control-panel-t a
 ## motor-controller
 [x] C++
 [x] távirányító többi csatornájának a figyelése, remote control option
+[x] PWM pinek visszacserélése
 
 ## line-detector
 [x] C++
