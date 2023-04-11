@@ -1,8 +1,9 @@
 # babocar
 This project contains all the necessary circuits designs, custom-designed 3D-printed elements, embedded firmware and debugging tools for an RC car that is able to perform self-driving tasks such as following guiding lines and pre-defined routes.
 
-An example of the car performing these tasks can be viewed here:
-https://www.youtube.com/watch?v=wYXTI0n2l1o&ab_channel=BMEVIKRobonAUT
+[<img src="https://github.com/somaveszelovszki/babocar/blob/master/docs/babocar.jpg" width="600">](https://www.youtube.com/watch?v=wYXTI0n2l1o&ab_channel=BMEVIKRobonAUT)
+
+An example of the car performing these tasks can be viewed on this [link](https://www.youtube.com/watch?v=wYXTI0n2l1o&ab_channel=BMEVIKRobonAUT)
 
 ## Directories:
 |Directory     |Role                                                                                      |
