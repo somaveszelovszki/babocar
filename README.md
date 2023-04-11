@@ -1,14 +1,13 @@
 # babocar
-Self-driving hardware and software.
+This project contains all the necessary circuits designs, custom-designed 3D-printed elements, embedded firmware and debugging tools for an RC car that is able to perform self-driving tasks such as following guiding lines and pre-defined routes.
 
-This project contains all the necessary circuits, custom-designed 3D elements, embedded firmware and debugging tools for an RC car able to perform self-driving tasks.
-
-Please note that the project is a work in progress, therefore if using parts of it for your own project, apply it with caution, as it may contain malfunctioning code.
+An example of the car performing these tasks can be viewed here:
+https://www.youtube.com/watch?v=wYXTI0n2l1o&ab_channel=BMEVIKRobonAUT
 
 ## Directories:
-|Direrctory    |Role                                                                                      |
+|Directory     |Role                                                                                      |
 |--------------|------------------------------------------------------------------------------------------|
-| 3d-models/   | SketchUp and Autodesk Fusion 360asd models of the 3D-printed elements of the car         |
+| 3d-models/   | SketchUp and Autodesk Fusion 360 models of the 3D-printed elements of the car         |
 | circuit/     | Schematics and PCB layouts created in Altium Designer                                    |
 | docs/        | Thorough thesis about the algorithms used for the localization and navigation of the car |
 | firmware/    | Separate projects for all the embedded sub-systems                                       |
