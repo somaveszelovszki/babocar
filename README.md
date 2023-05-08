@@ -34,4 +34,4 @@ The high-level control panel is responsible for navigating the car along a targe
 | checkout.sh | Checks out latest states of the development branch for each subdirectories        |
 | build.sh    | Builds unit tests for the firmware subprojects using the build platform as target |
 
-Find out more about my projects at [soma.veszelovszki.hu](soma.veszelovszki.hu)
+Find out more about my projects at [soma.veszelovszki.hu](https://soma.veszelovszki.hu)
