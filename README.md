@@ -16,6 +16,11 @@ The high-level control panel is responsible for navigating the car along a targe
 
 <img src="docs/babocar.jpg" width="600">
 
+The monitoring application helps testing and debugging, by providing a clean user interface for viewing and changing the essential car parameters.
+The application is implemented as a [Node.js](https://nodejs.org/en) web server with a [React](https://react.dev) frontend.
+
+<img src="https://raw.githubusercontent.com/somaveszelovszki/babocar-monitor/master/docs/gui_screenshot.png" width="600" />
+
 ## Directories:
 |Directory     |Role                                                                                      |
 |--------------|------------------------------------------------------------------------------------------|
