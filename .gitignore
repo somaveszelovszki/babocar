@@ -8,3 +8,4 @@
 *.toc
 
 build/
+.cache/
