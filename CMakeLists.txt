@@ -3,6 +3,8 @@ project(babocar)
 
 option(BUILD_TESTS "Option to build the module tests" ON)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_subdirectory(micro-utils)
 add_subdirectory(firmware/control-panel)
 add_subdirectory(firmware/line-detector)
