@@ -1,30 +1,11 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-declare -A branches
+git submodule update --init --recursive
 
-branches['.']='master'
-branches['3d-models']='master'
-branches['circuit/altium-libs']='master'
-branches['circuit/control-panel']='master'
-branches['circuit/line-detector']='master'
-branches['circuit/motor-controller']='master'
-branches['circuit/rs422-adapter']='master'
-branches['circuit/vl53l0x-adapter']='master'
-branches['circuit/voltage-converter']='master'
-branches['firmware/control-panel']='master'
-branches['firmware/line-detector']='master'
-branches['firmware/motor-controller']='master'
-branches['firmware/vl53l0x-adapter']='master'
-branches['micro-utils']='master'
-branches['monitor']='master'
-
-for dir in "${!branches[@]}"
-do
-    echo "Entering $dir..."
-    cd $dir
-    git checkout ${branches[$dir]}
-    git pull
-    cd -
-done
-
-echo 'Checkout finished successfully'
+git submodule foreach '
+  echo "Updating $name in $path"
+  git fetch origin
+  git checkout master || echo "⚠️ Could not checkout master in $name"
+  git pull origin master || echo "⚠️ Could not pull master in $name"
+'
