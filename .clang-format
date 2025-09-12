@@ -19,11 +19,34 @@ SpaceBeforeAssignmentOperators: true
 # Modern C++ options
 AllowAllParametersOfDeclarationOnNextLine: false
 Cpp11BracedListStyle: true
-SortIncludes: true
-IncludeBlocks: Regroup
 AllowShortBlocksOnASingleLine: false
 AllowShortFunctionsOnASingleLine: InlineOnly
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 KeepEmptyLinesAtTheStartOfBlocks: false
 AlignConsecutiveAssignments: true
+
+SortIncludes: true
+IncludeBlocks: Regroup
+IncludeIsMainRegex: ".*"
+
+IncludeCategories:
+  # 1. C system headers (stdio.h, stdlib.h, etc.)
+  - Regex: "^(<c[a-z_]+>|<assert.h>|<ctype.h>|<errno.h>|<fenv.h>|<float.h>|<inttypes.h>|<limits.h>|<locale.h>|<math.h>|<setjmp.h>|<signal.h>|<stdarg.h>|<stddef.h>|<stdint.h>|<stdio.h>|<stdlib.h>|<string.h>|<time.h>|<wchar.h>|<wctype.h>)$"
+    Priority: 1
+
+  # 2. C++ standard library headers (<vector>, <string>, <iostream>, etc.)
+  - Regex: "^<[^/]+>$"
+    Priority: 2
+
+  # 3. Third-party includes
+  - Regex: "^<(etl|gtest)/.*>"
+    Priority: 3
+
+  # 4. Micro headers
+  - Regex: "^<micro/.*>"
+    Priority: 4
+
+  # 5. Local project headers ("foo.hpp", "bar.h")
+  - Regex: '^"'
+    Priority: 5
